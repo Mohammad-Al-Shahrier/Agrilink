@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cart</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+
+<nav class="navbar">
+  <h2 class="logo" onclick="goHome()">🌱 AgriLink</h2>
+</nav>
+
+<h2 style="text-align:center; margin-top:20px;">My Cart 🛒</h2>
+
+<div id="cartItems" style="padding:20px;"></div>
+
+<div style="text-align:center;">
+  <button onclick="checkout()">Checkout</button>
+</div>
+
+<script src="../js/app.js"></script>
+
+<script>
+const user = JSON.parse(localStorage.getItem("currentUser"));
+
+function loadCart() {
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  cart = cart.filter(c => c.userEmail === user.email);
+
+  const container = document.getElementById("cartItems");
+
+  if(cart.length === 0){
+    container.innerHTML = "<p>No items in cart</p>";
+    return;
+  }
+
+  container.innerHTML = cart.map((c,i)=>`
+    <div style="margin:10px 0;">
+      <img src="${c.image}" width="60">
+      ${c.pname} - ${c.price}৳
+      <button onclick="removeItem(${i})">❌</button>
+    </div>
+  `).join("");
+}
+
+function removeItem(index){
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.splice(index,1);
+  localStorage.setItem("cart", JSON.stringify(cart));
+  loadCart();
+}
+
+function checkout(){
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+  cart.forEach(item=>{
+    orders.push({
+      userEmail: item.userEmail,
+      pname: item.pname,
+      price: item.price,
+      image: item.image,
+      date: new Date().toLocaleString()
+    });
+  });
+
+  localStorage.setItem("orders", JSON.stringify(orders));
+  localStorage.removeItem("cart");
+
+  alert(" Order placed!");
+  loadCart();
+}
+
+loadCart();
+</script>
+
+</body>
+</html>

@@ -33,6 +33,19 @@ main {
   z-index: 1000;
 }
 
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  transition: 0.3s;
+  padding: 8px 12px; /* clickable area bigger */
+  border-radius: 6px;
+}
+
+.nav-links a:hover {
+  background: rgba(255,255,255,0.1);
+}
+
 .logo {
   color: white;
   font-size: 28px;

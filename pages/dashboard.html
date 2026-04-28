@@ -6,119 +6,275 @@
 
 <title>Dashboard | AgriLink</title>
 
-<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/style.css">
 <link rel="stylesheet" href="../css/dashboard.css">
 <link rel="stylesheet" href="../css/responsive.css">
 </head>
 
 <body>
 
+<!-- NAVBAR -->
+<nav class="navbar">
+  <h2 class="logo" onclick="goHome()">🌱 AgriLink</h2>
+
+  <div class="nav-links">
+
+    <a href="profile.html">Profile</a>
+    <a href="cart.html">Cart</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
+</nav>
+
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>🌱 AgriLink</h2>
+  <ul id="sidebarMenu"></ul>
+</div>
 
-    <div class="sidebar">
+<!-- MAIN -->
+<div class="dashboard-content">
 
-        <h2>🌱 AgriLink</h2>
+  <div class="dashboard-header">
+    <h1 id="dashboardTitle"></h1>
+    <strong id="welcomeText"></strong>
+  </div>
 
-        <ul>
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Products</a></li>
-            <li><a href="#">Orders</a></li>
-            <li><a href="#">Profile</a></li>
-            <li><a href="#">Settings</a></li>
-            <li><a href="#">Logout</a></li>
-        </ul>
+  <div class="stats" id="statsContainer"></div>
 
-    </div>
-
-    <!-- MAIN -->
-
-    <div class="dashboard-content">
-
-        <div class="dashboard-header">
-            <h1>Farmer Dashboard</h1>
-
-            <div>
-                <strong>Welcome, Farmer 👨‍🌾</strong>
-            </div>
-        </div>
-
-        <!-- STATS -->
-
-        <div class="stats">
-
-            <div class="stat-card">
-                <h3>Total Products</h3>
-                <p>12</p>
-            </div>
-
-            <div class="stat-card">
-                <h3>Total Orders</h3>
-                <p>38</p>
-            </div>
-
-            <div class="stat-card">
-                <h3>Total Revenue</h3>
-                <p>৳ 25,000</p>
-            </div>
-
-            <div class="stat-card">
-                <h3>Pending Orders</h3>
-                <p>5</p>
-            </div>
-
-        </div>
-
-        <!-- TABLE -->
-
-        <div class="table-container">
-
-            <h2>Recent Orders</h2>
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>Customer</th>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>Rahim</td>
-                        <td>Tomato</td>
-                        <td>5 KG</td>
-                        <td>Delivered</td>
-                    </tr>
-
-                    <tr>
-                        <td>Karim</td>
-                        <td>Carrot</td>
-                        <td>3 KG</td>
-                        <td>Pending</td>
-                    </tr>
-
-                    <tr>
-                        <td>Jamal</td>
-                        <td>Cabbage</td>
-                        <td>7 KG</td>
-                        <td>Processing</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
+  <div class="table-container">
+    <h2 id="tableTitle"></h2>
+    <table id="dataTable"></table>
+  </div>
 
 </div>
+</div>
+
+<script src="../js/app.js"></script>
+
+<script>
+// LOGIN CHECK
+const user = JSON.parse(localStorage.getItem("currentUser"));
+if (!user) {
+  alert("Login first!");
+  location.href = "login.html";
+}
+
+// DOM
+const sidebar = document.getElementById("sidebarMenu");
+const title = document.getElementById("dashboardTitle");
+const welcome = document.getElementById("welcomeText");
+const stats = document.getElementById("statsContainer");
+const table = document.getElementById("dataTable");
+const tableTitle = document.getElementById("tableTitle");
+
+// ROLE BASED SIDEBAR
+if (user.role === "farmer") {
+  sidebar.innerHTML = `
+ 
+    <li><a href="#" onclick="showProducts()">My Products</a></li>
+    <li><a href="#" onclick="showOrders()">Orders</a></li>
+    <li><a href="profile.html">Profile</a></li>
+    <li><a href="#" onclick="logout()">Logout</a></li>
+  `;
+} else {
+  sidebar.innerHTML = `
+  
+    <li><a href="#" onclick="showOrders()">My Orders</a></li>
+    <li><a href="profile.html">Profile</a></li>
+    <li><a href="#" onclick="logout()">Logout</a></li>
+  `;
+}
+
+// DEFAULT LOAD
+loadDashboard();
+
+function loadDashboard() {
+  if (user.role === "farmer") {
+    title.innerText = "Farmer Dashboard";
+    welcome.innerText = "Welcome, Farmer 👨‍🌾";
+    showProducts();
+  } else {
+    title.innerText = "Customer Dashboard";
+    welcome.innerText = "Welcome 👤";
+    showOrders();
+  }
+}
+
+// ================= STORAGE =================
+function getProducts() {
+  return JSON.parse(localStorage.getItem("products")) || [];
+}
+
+// ================= SHOW PRODUCTS =================
+function showProducts() {
+
+  const products = getProducts();
+
+  tableTitle.innerText = "My Products";
+
+  stats.innerHTML = `
+    <div class="stat-card">
+      <h3>Total Products</h3>
+      <p>${products.length}</p>
+    </div>
+  `;
+
+  table.innerHTML = `
+    <!-- ADD PRODUCT -->
+    <div style="margin-bottom:20px; display:flex; gap:10px; flex-wrap:wrap;">
+      <input id="pname" placeholder="Product Name">
+      <input id="pprice" placeholder="Price">
+      <input type="file" id="pimage">
+      <button onclick="addProduct()">➕ Add Product</button>
+    </div>
+
+    <!-- TABLE -->
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th style="text-align:center;">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      ${products.map((p, i) => `
+        <tr>
+          <td>
+            <img src="${p.image}" width="60" style="border-radius:8px;">
+          </td>
+          <td>${p.pname}</td>
+          <td>${p.price}৳</td>
+          <td style="text-align:center;">
+            <button onclick="editProduct(${i})">✏️ Edit</button>
+            <button onclick="deleteProduct(${i})">🗑️ Delete</button>
+            <button onclick="changeImage(${i})">🖼️ Image</button>
+          </td>
+        </tr>
+      `).join("")}
+    </tbody>
+  `;
+}
+
+// ================= ADD =================
+function addProduct() {
+  let name = document.getElementById("pname").value;
+  let price = document.getElementById("pprice").value;
+  let file = document.getElementById("pimage").files[0];
+
+  if (!name || !price || !file) return alert("All fields required!");
+
+  let reader = new FileReader();
+
+  reader.onload = function(e) {
+    let products = getProducts();
+
+    products.push({
+      pname: name,
+      price: price,
+      image: e.target.result
+    });
+
+    localStorage.setItem("products", JSON.stringify(products));
+    showProducts();
+  };
+
+  reader.readAsDataURL(file);
+}
+
+// ================= EDIT =================
+function editProduct(index) {
+  let products = getProducts();
+
+  let newName = prompt("Edit product name", products[index].pname);
+  let newPrice = prompt("Edit price", products[index].price);
+
+  if (!newName || !newPrice) return;
+
+  products[index].pname = newName;
+  products[index].price = newPrice;
+
+  localStorage.setItem("products", JSON.stringify(products));
+  showProducts();
+}
+
+// ================= DELETE =================
+function deleteProduct(index){
+  let products = getProducts();
+
+  if (!confirm("Delete this product?")) return;
+
+  products.splice(index,1);
+
+  localStorage.setItem("products", JSON.stringify(products));
+  showProducts();
+}
+
+// ================= CHANGE IMAGE =================
+function changeImage(index){
+
+  let input = document.createElement("input");
+  input.type = "file";
+
+  input.onchange = function(){
+    let file = input.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function(e){
+      let products = getProducts();
+      products[index].image = e.target.result;
+
+      localStorage.setItem("products", JSON.stringify(products));
+      showProducts();
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  input.click();
+}
+
+// ================= ORDERS =================
+function showOrders(){
+  tableTitle.innerText = "Orders";
+
+  let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+  if(user.role === "customer"){
+    orders = orders.filter(o => o.userEmail === user.email);
+  }
+
+  stats.innerHTML = `
+    <div class="stat-card">
+      <h3>Total Orders</h3>
+      <p>${orders.length}</p>
+    </div>
+  `;
+
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      ${orders.map(o=>`
+        <tr>
+          <td>${o.pname}</td>
+          <td>${o.price}৳</td>
+          <td>${o.date || "-"}</td>
+        </tr>
+      `).join("")}
+    </tbody>
+  `;
+}
+</script>
 
 </body>
 </html>

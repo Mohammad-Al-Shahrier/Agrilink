@@ -5,20 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AgriLink</title>
 
-  <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/responsive.css">
 </head>
 
 <body>
 
+<!-- ✅ UPDATED NAVBAR -->
 <nav class="navbar">
   <h2 class="logo" onclick="goHome()">🌱 AgriLink</h2>
 
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="pages/login.html">Sign In</a>
-    <a href="pages/register.html" class="btn">Sign Up</a>
+  <div class="nav-links" id="navLinks">
+    
+
+    <!-- Guest -->
+    <span id="guestLinks">
+      <a href="pages/login.html">Sign In</a>
+      <a href="pages/register.html" class="btn">Sign Up</a>
+    </span>
+
+    <!-- Logged-in User -->
+    <span id="userLinks" class="hidden">
+      <a href="pages/profile.html">Profile</a>
+      <a href="pages/dashboard.html">Dashboard</a>
+      <a href="#">Settings</a>
+      <a href="#">Cart</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </span>
   </div>
 </nav>
 
@@ -49,11 +62,12 @@
     </form>
   </div>
 
-  <!-- PRODUCT LIST -->
+  <!-- PRODUCTS -->
   <div id="productList" class="products"></div>
 
 </main>
 
+<!-- FOOTER -->
 <footer>
   <p>© 2026 AgriLink | Smart Agriculture 🌱</p>
 </footer>

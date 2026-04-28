@@ -1,8 +1,25 @@
 const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-// HOME
+// ✅ FIXED HOME REDIRECT (works from any page)
 function goHome() {
-  location.href = "index.html";
+  window.location.href = window.location.pathname.includes("pages")
+    ? "../index.html"
+    : "index.html";
+}
+
+// NAVBAR UPDATE
+const guestLinks = document.getElementById("guestLinks");
+const userLinks = document.getElementById("userLinks");
+
+if (currentUser) {
+  guestLinks?.classList.add("hidden");
+  userLinks?.classList.remove("hidden");
+}
+
+// LOGOUT
+function logout() {
+  localStorage.removeItem("currentUser");
+  goHome();
 }
 
 // FARMER PANEL
@@ -18,7 +35,7 @@ if (search) {
   search.addEventListener("input", e => {
     const value = e.target.value.toLowerCase();
 
-    const products = Storage.get("products");
+    const products = JSON.parse(localStorage.getItem("products")) || [];
 
     const filtered = products.filter(p =>
       p.pname.toLowerCase().includes(value)
@@ -26,4 +43,10 @@ if (search) {
 
     renderProducts(filtered);
   });
+}
+
+// OPTIONAL: hide dashboard for customer
+const dashboardLink = document.getElementById("dashboardLink");
+if (currentUser?.role !== "farmer" && dashboardLink) {
+  dashboardLink.style.display = "none";
 }
