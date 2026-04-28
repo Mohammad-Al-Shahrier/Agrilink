@@ -1,3 +1,31 @@
+function toggleFields() {
+  farmerFields.style.display = regRole.value === "farmer" ? "block" : "none";
+  customerFields.style.display = regRole.value === "customer" ? "block" : "none";
+}
+
+function register() {
+  const name = regName.value.trim();
+  const email = regEmail.value.trim();
+  const pass = regPass.value.trim();
+  const role = regRole.value;
+
+  if (!name || !email || !pass) return alert("All fields required!");
+
+  let users = Storage.get("users");
+
+  if (users.some(u => u.email === email)) {
+    return alert("User exists!");
+  }
+
+  const user = {
+    name,
+    email,
+    password: pass,
+    role
+  };
+
+  users.push(user);
+  Storage.set("users", users);
 let users = JSON.parse(localStorage.getItem("users")) || [];
 
 function toggleFields() {
@@ -30,6 +58,16 @@ function register() {
 }
 
 function login() {
+  const input = loginEmail.value.trim();
+  const pass = loginPass.value.trim();
+
+  const users = Storage.get("users");
+
+  const user = users.find(
+    u => (u.email === input || u.name === input) && u.password === pass
+  );
+
+  if (!user) return alert("Invalid!");
   let input = loginEmail.value.trim();
   let pass = loginPass.value.trim();
 

@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriLink</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
 <meta charset="UTF-8">
 <title>AgriLink</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
 <nav class="navbar">
   <h2 class="logo" onclick="goHome()">🌱 AgriLink</h2>
+
   <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="pages/login.html">Sign In</a>
@@ -16,6 +25,37 @@
   </div>
 </nav>
 
+<!-- MAIN CONTENT -->
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Fresh & Organic Vegetables 🥬</h1>
+    <p>Farm to Home | 100% Natural & Chemical Free</p>
+  </section>
+
+  <!-- SEARCH -->
+  <div class="search-box">
+    <input type="text" id="search" placeholder="🔍 Search fresh products...">
+  </div>
+
+  <!-- FARMER PANEL -->
+  <div id="farmerPanel" class="farmer-panel hidden">
+    <h2>Add Product 🧑‍🌾</h2>
+
+    <form id="productForm">
+      <input type="text" id="pname" placeholder="Product Name" required>
+      <input type="number" id="pprice" placeholder="Price" required>
+      <input type="file" id="pimage" required>
+
+      <button type="submit">Add Product</button>
+    </form>
+  </div>
+
+  <!-- PRODUCT LIST -->
+  <div id="productList" class="products"></div>
+
+</main>
 <section class="hero">
   <h1>Fresh & Organic Vegetables 🥬</h1>
   <p>Farm to Home | 100% Natural & Chemical Free</p>
@@ -37,6 +77,11 @@
 <footer>
   <p>© 2026 AgriLink | Smart Agriculture 🌱</p>
 </footer>
+
+<!-- JS -->
+<script src="js/storage.js"></script>
+<script src="js/product.js"></script>
+<script src="js/app.js"></script>
 
 <script src="js/product.js"></script>
 <script src="js/app.js"></script>

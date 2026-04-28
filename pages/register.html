@@ -1,4 +1,21 @@
 <!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/auth.css">
+
+</head>
+
+<body class="auth-body">
+
+<div class="auth-container">
+  <h2>Create Account</h2>
+
+  <input id="regName" placeholder="Name">
+  <input id="regEmail" placeholder="Email">
+  <input id="regPass" type="password" placeholder="Password">
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -13,13 +30,26 @@
   <input type="text" id="regName" placeholder="Full Name">
   <input type="email" id="regEmail" placeholder="Email">
   <input type="password" id="regPass" placeholder="Password">
-
   <select id="regRole" onchange="toggleFields()">
     <option value="farmer">Farmer</option>
     <option value="customer">Customer</option>
   </select>
 
   <div id="farmerFields">
+    <input id="farmName" placeholder="Farm Name">
+    <input id="location" placeholder="Location">
+  </div>
+
+  <div id="customerFields" style="display:none;">
+    <input id="address" placeholder="Address">
+  </div>
+
+  <button onclick="register()">Register</button>
+</div>
+
+<script src="../js/storage.js"></script>
+<script src="../js/auth.js"></script>
+
     <input type="text" id="farmName" placeholder="Farm Name">
     <input type="text" id="location" placeholder="Farm Location">
   </div>
