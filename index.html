@@ -8,11 +8,13 @@
   <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/responsive.css">
+<meta charset="UTF-8">
+<title>AgriLink</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar">
   <h2 class="logo" onclick="goHome()">🌱 AgriLink</h2>
 
@@ -54,8 +56,24 @@
   <div id="productList" class="products"></div>
 
 </main>
+<section class="hero">
+  <h1>Fresh & Organic Vegetables 🥬</h1>
+  <p>Farm to Home | 100% Natural & Chemical Free</p>
+  <a href="#productList" class="hero-btn">🌿 Shop Now</a>
+</section>
 
-<!-- FOOTER -->
+<input type="text" id="search" placeholder="🔍 Search fresh products...">
+
+<div id="farmerPanel" class="farmer-panel">
+  <h2>Add Product 🧑‍🌾</h2>
+  <input type="text" id="pname" placeholder="Product Name">
+  <input type="number" id="pprice" placeholder="Price">
+  <input type="file" id="pimage">
+  <button onclick="addProduct()">Add Product</button>
+</div>
+
+<div id="productList" class="grid"></div>
+
 <footer>
   <p>© 2026 AgriLink | Smart Agriculture 🌱</p>
 </footer>
@@ -65,5 +83,7 @@
 <script src="js/product.js"></script>
 <script src="js/app.js"></script>
 
+<script src="js/product.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
