@@ -26,10 +26,6 @@ body {
   text-decoration: none;
 }
 
-.nav-links a:hover {
-  color: #64dd17;
-}
-
 /* HERO */
 .hero {
   height: 85vh;
@@ -42,24 +38,10 @@ body {
 
   background:
     linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
-    url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6');
+    url('../images/body.jpg');
 
   background-size: cover;
   background-position: center;
-}
-
-.hero h1 {
-  font-size: 3rem;
-  animation: fadeIn 1s ease;
-}
-
-.hero-btn {
-  margin-top: 20px;
-  padding: 12px 25px;
-  background: #64dd17;
-  color: white;
-  border-radius: 25px;
-  text-decoration: none;
 }
 
 /* SEARCH */
@@ -69,10 +51,9 @@ body {
   width: 50%;
   border-radius: 30px;
   border: none;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
 }
 
-/* FARMER PANEL */
+/* FARMER */
 .farmer-panel {
   display: none;
   width: 60%;
@@ -80,11 +61,6 @@ body {
   padding: 20px;
   background: white;
   border-radius: 20px;
-}
-
-.farmer-panel input {
-  margin: 10px;
-  padding: 10px;
 }
 
 /* GRID */
@@ -100,25 +76,18 @@ body {
 .card-product {
   background: white;
   border-radius: 20px;
-  overflow: hidden;
   text-align: center;
-  transition: 0.3s;
-}
-
-.card-product:hover {
-  transform: scale(1.05);
 }
 
 .card-product img {
-  width: 50%;
+  width: 100%;
   height: 180px;
   object-fit: cover;
 }
 
 .card-product button {
-  margin: 5px;
+  margin: 10px;
   padding: 10px;
-  border-radius: 100px;
   background: green;
   color: white;
   border: none;
@@ -129,7 +98,7 @@ body {
   height: 100vh;
   background:
     linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-    url('https://images.unsplash.com/photo-1464226184884-fa280b87c399');
+    url('../images/body2.jpg');
   background-size: cover;
   display: flex;
   justify-content: center;
@@ -145,13 +114,6 @@ body {
   text-align: center;
 }
 
-.auth-card input,
-.auth-card select {
-  width: 90%;
-  padding: 12px;
-  margin: 10px 0;
-}
-
 /* FOOTER */
 footer {
   margin-top: auto;
@@ -159,10 +121,4 @@ footer {
   padding: 20px;
   background: black;
   color: white;
-}
-
-/* ANIMATION */
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
 }
