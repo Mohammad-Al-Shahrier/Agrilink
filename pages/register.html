@@ -16,20 +16,7 @@
   <input id="regName" placeholder="Name">
   <input id="regEmail" placeholder="Email">
   <input id="regPass" type="password" placeholder="Password">
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Register</title>
-<link rel="stylesheet" href="../css/style.css">
-</head>
-<body class="auth-bg">
 
-<div class="auth-card">
-  <h2>Create Account</h2>
-
-  <input type="text" id="regName" placeholder="Full Name">
-  <input type="email" id="regEmail" placeholder="Email">
-  <input type="password" id="regPass" placeholder="Password">
   <select id="regRole" onchange="toggleFields()">
     <option value="farmer">Farmer</option>
     <option value="customer">Customer</option>
@@ -50,20 +37,5 @@
 <script src="../js/storage.js"></script>
 <script src="../js/auth.js"></script>
 
-    <input type="text" id="farmName" placeholder="Farm Name">
-    <input type="text" id="location" placeholder="Farm Location">
-  </div>
-
-  <div id="customerFields" style="display:none;">
-    <input type="text" id="address" placeholder="Delivery Address">
-  </div>
-
-  <button onclick="register()">Create Account</button>
-
-  <p>Already have an account? <a href="login.html">Login</a></p>
-  <p><a href="../index.html">⬅ Back to Home</a></p>
-</div>
-
-<script src="../js/auth.js"></script>
 </body>
 </html>
