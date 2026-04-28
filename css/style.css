@@ -1,0 +1,191 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: #f5f7f2;
+  color: #222;
+
+  /* ✅ Footer fix */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* MAIN CONTENT WRAPPER (important for footer) */
+main {
+  flex: 1;
+}
+
+/* NAVBAR */
+.navbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 60px;
+  background: #1b5e20;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  color: white;
+  font-size: 28px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  color: #c5ff66;
+}
+
+/* BUTTON */
+.btn {
+  background: #76ff03;
+  color: #111 !important;
+  padding: 10px 20px;
+  border-radius: 30px;
+}
+
+/* HERO */
+.hero {
+  height: 80vh;
+  background:
+    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+    url("../images/body.jpg");
+
+  background-size: cover;
+  background-position: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 60px;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 20px;
+}
+
+/* SEARCH */
+.search-box {
+  width: 50%;
+  margin: -30px auto 40px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 40px;
+  outline: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* PRODUCTS */
+.products {
+  width: 90%;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+  gap: 25px;
+  padding-bottom: 50px;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+.card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-body h3 {
+  margin-bottom: 10px;
+}
+
+.price {
+  color: green;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.card button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 30px;
+  background: #2e7d32;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* FARMER PANEL */
+.farmer-panel {
+  width: 90%;
+  margin: 30px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 15px;
+}
+
+.farmer-panel input,
+.farmer-panel button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+}
+
+/* FOOTER */
+footer {
+  background: #111;
+  color: white;
+  text-align: center;
+
+  padding: 20px;
+  margin-top: auto; /* ✅ pushes footer to bottom */
+}
+
+/* HIDDEN */
+.hidden {
+  display: none;
+}
