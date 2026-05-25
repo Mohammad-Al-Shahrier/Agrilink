@@ -1,81 +1,557 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <title>Cart</title>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    My Cart | AgriLink
+  </title>
+
+  <!-- CSS -->
   <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/cart.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+
 </head>
 
-<body>
+<body class="cart-body">
+
+<!-- ================= NAVBAR ================= -->
 
 <nav class="navbar">
-  <h2 class="logo" onclick="goHome()">🌱 AgriLink</h2>
+
+  <h2
+    class="logo"
+    onclick="goHome()"
+  >
+    🌱 AgriLink
+  </h2>
+
+  <div class="nav-links">
+
+    <a href="../index.html">
+      🏠 Home
+    </a>
+
+    <a href="dashboard.html">
+      📊 Dashboard
+    </a>
+
+    <a href="profile.html">
+      👤 Profile
+    </a>
+
+    <a
+      href="#"
+      onclick="logout()"
+    >
+      🚪 Logout
+    </a>
+
+  </div>
+
 </nav>
 
-<h2 style="text-align:center; margin-top:20px;">My Cart 🛒</h2>
+<!-- ================= MAIN ================= -->
 
-<div id="cartItems" style="padding:20px;"></div>
+<main class="cart-main">
 
-<div style="text-align:center;">
-  <button onclick="checkout()">Checkout</button>
-</div>
+  <section class="cart-page">
+
+    <!-- LEFT SIDE -->
+    <div class="cart-left">
+
+      <!-- HEADER -->
+      <div class="cart-header">
+
+        <h1>
+          My Cart 🛒
+        </h1>
+
+        <p>
+          Review your selected fresh products
+        </p>
+
+      </div>
+
+      <!-- CART ITEMS -->
+      <div
+        id="cartItems"
+        class="cart-container"
+      ></div>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="cart-summary">
+
+      <div class="summary-card">
+
+        <h2>
+          Order Summary
+        </h2>
+
+        <div class="summary-row">
+
+          <span>
+            Total Products
+          </span>
+
+          <strong id="totalItems">
+            0
+          </strong>
+
+        </div>
+
+        <div class="summary-row">
+
+          <span>
+            Total Price
+          </span>
+
+          <strong id="totalPrice">
+            ৳ 0
+          </strong>
+
+        </div>
+
+        <button
+          class="checkout-btn"
+          onclick="checkout()"
+        >
+          ✅ Checkout
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="footer">
+
+  <div class="footer-container">
+
+    <!-- BRAND -->
+    <div class="footer-box">
+
+      <h2>
+        🌱 AgriLink
+      </h2>
+
+      <p>
+        Smart Agriculture platform connecting
+        farmers and customers directly.
+      </p>
+
+    </div>
+
+    <!-- LINKS -->
+    <div class="footer-box">
+
+      <h3>
+        Quick Links
+      </h3>
+
+      <a href="../index.html">
+        Home
+      </a>
+
+      <a href="dashboard.html">
+        Dashboard
+      </a>
+
+      <a href="profile.html">
+        Profile
+      </a>
+
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+
+    © 2026 AgriLink | Smart Agriculture 🌱
+
+  </div>
+
+</footer>
+
+<!-- ================= JAVASCRIPT ================= -->
 
 <script src="../js/app.js"></script>
 
 <script>
-const user = JSON.parse(localStorage.getItem("currentUser"));
+
+// =====================================
+// USER AUTH CHECK
+// =====================================
+
+const currentUser =
+  JSON.parse(
+    localStorage.getItem("currentUser")
+  );
+
+if (!currentUser) {
+
+  alert("Please login first!");
+
+  location.href = "login.html";
+}
+
+// =====================================
+// GET ALL CART ITEMS
+// =====================================
+
+function getAllCart() {
+
+  return JSON.parse(
+    localStorage.getItem("cart")
+  ) || [];
+}
+
+// =====================================
+// GET USER CART
+// =====================================
+
+function getUserCart() {
+
+  return getAllCart().filter(item =>
+
+    item.userEmail === currentUser.email
+  );
+}
+
+// =====================================
+// SAVE USER CART
+// =====================================
+
+function saveUserCart(updatedUserCart) {
+
+  let allCart = getAllCart();
+
+  // REMOVE OLD USER CART
+  allCart = allCart.filter(item =>
+
+    item.userEmail !== currentUser.email
+  );
+
+  // ADD UPDATED CART
+  allCart.push(...updatedUserCart);
+
+  // SAVE
+  localStorage.setItem(
+    "cart",
+    JSON.stringify(allCart)
+  );
+}
+
+// =====================================
+// LOAD CART
+// =====================================
 
 function loadCart() {
 
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const cart = getUserCart();
 
-  cart = cart.filter(c => c.userEmail === user.email);
+  const cartContainer =
+    document.getElementById("cartItems");
 
-  const container = document.getElementById("cartItems");
+  const totalItemsElement =
+    document.getElementById("totalItems");
 
-  if(cart.length === 0){
-    container.innerHTML = "<p>No items in cart</p>";
+  const totalPriceElement =
+    document.getElementById("totalPrice");
+
+  // EMPTY CART
+  if (cart.length === 0) {
+
+    cartContainer.innerHTML = `
+
+      <div class="empty-cart">
+
+        <h2>
+          Your cart is empty 🛒
+        </h2>
+
+        <p>
+          Add products from homepage
+        </p>
+
+        <a
+          href="../index.html"
+          class="shop-btn"
+        >
+          🌿 Continue Shopping
+        </a>
+
+      </div>
+    `;
+
+    totalItemsElement.innerText = "0";
+
+    totalPriceElement.innerText = "৳ 0";
+
     return;
   }
 
-  container.innerHTML = cart.map((c,i)=>`
-    <div style="margin:10px 0;">
-      <img src="${c.image}" width="60">
-      ${c.pname} - ${c.price}৳
-      <button onclick="removeItem(${i})">❌</button>
-    </div>
-  `).join("");
+  let totalItems = 0;
+  let totalPrice = 0;
+
+  cartContainer.innerHTML = "";
+
+  // PRODUCT LOOP
+  cart.forEach((item, index) => {
+
+    // FIX MISSING IMAGE
+    const productImage =
+      item.image ||
+      "../assets/images/default.png";
+
+    // FIX QUANTITY
+    const quantity =
+      Number(item.qty) || 1;
+
+    // FIX PRICE
+    const price =
+      Number(item.price) || 0;
+
+    // TOTAL
+    const itemTotal =
+      quantity * price;
+
+    totalItems += quantity;
+
+    totalPrice += itemTotal;
+
+    cartContainer.innerHTML += `
+
+      <div class="cart-card">
+
+        <!-- IMAGE -->
+        <div class="cart-image">
+
+          <img
+            src="${productImage}"
+            alt="${item.pname}"
+          >
+
+        </div>
+
+        <!-- DETAILS -->
+        <div class="cart-details">
+
+          <h3>
+            ${item.pname}
+          </h3>
+
+          <p class="cart-price">
+            ৳ ${price}
+          </p>
+
+          <!-- QUANTITY -->
+          <div class="qty-box">
+
+            <button
+              onclick="changeQty(${index}, -1)"
+            >
+              -
+            </button>
+
+            <span>
+              ${quantity}
+            </span>
+
+            <button
+              onclick="changeQty(${index}, 1)"
+            >
+              +
+            </button>
+
+          </div>
+
+          <!-- TOTAL -->
+          <p class="total-price">
+
+            Total:
+            <strong>
+              ৳ ${itemTotal}
+            </strong>
+
+          </p>
+
+        </div>
+
+        <!-- REMOVE -->
+        <div class="cart-action">
+
+          <button
+            class="remove-btn"
+            onclick="removeItem(${index})"
+          >
+            ❌ Remove
+          </button>
+
+        </div>
+
+      </div>
+    `;
+  });
+
+  // UPDATE SUMMARY
+  totalItemsElement.innerText =
+    totalItems;
+
+  totalPriceElement.innerText =
+    `৳ ${totalPrice}`;
 }
 
-function removeItem(index){
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart.splice(index,1);
-  localStorage.setItem("cart", JSON.stringify(cart));
+// =====================================
+// CHANGE QUANTITY
+// =====================================
+
+function changeQty(index, change) {
+
+  let cart = getUserCart();
+
+  if (!cart[index]) return;
+
+  cart[index].qty =
+    (Number(cart[index].qty) || 1)
+    + change;
+
+  // REMOVE IF 0
+  if (cart[index].qty <= 0) {
+
+    const confirmDelete =
+      confirm(
+        "Remove this item from cart?"
+      );
+
+    if (confirmDelete) {
+
+      cart.splice(index, 1);
+
+    } else {
+
+      cart[index].qty = 1;
+    }
+  }
+
+  saveUserCart(cart);
+
   loadCart();
 }
 
-function checkout(){
+// =====================================
+// REMOVE PRODUCT
+// =====================================
 
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  let orders = JSON.parse(localStorage.getItem("orders")) || [];
+function removeItem(index) {
 
-  cart.forEach(item=>{
+  let cart = getUserCart();
+
+  const confirmDelete =
+    confirm("Remove this product?");
+
+  if (!confirmDelete) return;
+
+  cart.splice(index, 1);
+
+  saveUserCart(cart);
+
+  loadCart();
+}
+
+// =====================================
+// CHECKOUT
+// =====================================
+
+function checkout() {
+
+  const cart = getUserCart();
+
+  if (cart.length === 0) {
+
+    alert("Cart is empty!");
+
+    return;
+  }
+
+  let orders =
+    JSON.parse(
+      localStorage.getItem("orders")
+    ) || [];
+
+  // SAVE ORDERS
+  cart.forEach(item => {
+
     orders.push({
-      userEmail: item.userEmail,
-      pname: item.pname,
-      price: item.price,
-      image: item.image,
-      date: new Date().toLocaleString()
+
+      userEmail:
+        currentUser.email,
+
+      pname:
+        item.pname,
+
+      image:
+        item.image,
+
+      price:
+        Number(item.price),
+
+      qty:
+        Number(item.qty) || 1,
+
+      total:
+        (Number(item.qty) || 1)
+        * Number(item.price),
+
+      status:
+        "Confirmed",
+
+      date:
+        new Date().toLocaleString()
     });
   });
 
-  localStorage.setItem("orders", JSON.stringify(orders));
-  localStorage.removeItem("cart");
+  // SAVE ORDERS
+  localStorage.setItem(
+    "orders",
+    JSON.stringify(orders)
+  );
 
-  alert(" Order placed!");
+  // CLEAR USER CART
+  saveUserCart([]);
+
+  alert(
+    "✅ Order Confirmed Successfully!"
+  );
+
+  // RELOAD
   loadCart();
 }
 
-loadCart();
+// =====================================
+// INITIAL LOAD
+// =====================================
+
+document.addEventListener(
+  "DOMContentLoaded",
+  loadCart
+);
+
 </script>
 
 </body>
