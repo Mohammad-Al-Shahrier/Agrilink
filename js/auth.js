@@ -1,48 +1,69 @@
-function toggleFields() {
-  farmerFields.style.display = regRole.value === "farmer" ? "block" : "none";
-  customerFields.style.display = regRole.value === "customer" ? "block" : "none";
-}
+const API_URL = "http://localhost:5000/api/auth";
 
-function register() {
-  const name = regName.value.trim();
-  const email = regEmail.value.trim();
-  const pass = regPass.value.trim();
-  const role = regRole.value;
+document
+.getElementById("registerForm")
+.addEventListener("submit", register);
 
-  if (!name || !email || !pass) return alert("All fields required!");
+async function register(e) {
 
-  let users = Storage.get("users");
+  e.preventDefault();
 
-  if (users.some(u => u.email === email)) {
-    return alert("User exists!");
-  }
+  const userData = {
 
-  const user = {
-    name,
-    email,
-    password: pass,
-    role
+    name:
+      document.getElementById("regName").value,
+
+    email:
+      document.getElementById("regEmail").value,
+
+    password:
+      document.getElementById("regPass").value,
+
+    role:
+      document.getElementById("regRole").value,
+
+    farmName:
+      document.getElementById("farmName").value,
+
+    location:
+      document.getElementById("location").value,
+
+    address:
+      document.getElementById("address").value
   };
 
-  users.push(user);
-  Storage.set("users", users);
+  try {
 
-  alert("Account created!");
-  location.href = "login.html";
-}
+    const response = await fetch(
+      `${API_URL}/register`,
+      {
+        method: "POST",
 
-function login() {
-  const input = loginEmail.value.trim();
-  const pass = loginPass.value.trim();
+        headers: {
+          "Content-Type": "application/json"
+        },
 
-  const users = Storage.get("users");
+        body: JSON.stringify(userData)
+      }
+    );
 
-  const user = users.find(
-    u => (u.email === input || u.name === input) && u.password === pass
-  );
+    const data = await response.json();
 
-  if (!user) return alert("Invalid!");
+    if (!response.ok) {
 
-  localStorage.setItem("currentUser", JSON.stringify(user));
-  location.href = "../index.html";
+      alert(data.message);
+
+      return;
+    }
+
+    alert("Registration Successful");
+
+    window.location.href = "login.html";
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert("Server Error");
+  }
 }
