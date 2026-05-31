@@ -1,238 +1,66 @@
-// ===============================
-// GET PRODUCTS
-// ===============================
+async function loadProducts() {
 
-function getProducts() {
+  try {
 
-  return JSON.parse(
-    localStorage.getItem("products")
-  ) || [];
+    const response =
+      await fetch(
+        "http://localhost:5000/api/products"
+      );
+
+    const data =
+      await response.json();
+
+    renderProducts(
+      data.products
+    );
+
+  } catch (error) {
+
+    console.log(error);
+  }
 }
 
-// ===============================
-// RENDER PRODUCTS
-// ===============================
-
-function renderProducts(list = null) {
+function renderProducts(
+  products = []
+) {
 
   const container =
-    document.getElementById("productList");
+    document.getElementById(
+      "productList"
+    );
 
   if (!container) return;
 
-  const products =
-    list || getProducts();
+  if (!products.length) {
 
-  container.innerHTML = "";
-
-  // EMPTY PRODUCTS
-  if (products.length === 0) {
-
-    container.innerHTML = `
-
-      <div class="empty-products">
-
-        <h2>
-          No Products Available 😔
-        </h2>
-
-      </div>
-    `;
+    container.innerHTML =
+      "<h2>No Products Found</h2>";
 
     return;
   }
 
-  // LOOP PRODUCTS
-  products.forEach((product, index) => {
-
-    container.innerHTML += `
+  container.innerHTML =
+    products.map(product => `
 
       <div class="card">
 
-        <!-- IMAGE -->
         <img
-          src="${product.image}"
+          src="http://localhost:5000/${product.image}"
           alt="${product.pname}"
         >
 
-        <!-- BODY -->
-        <div class="card-body">
+        <h3>${product.pname}</h3>
 
-          <h3>
-            ${product.pname}
-          </h3>
-
-          <p class="price">
-            ৳ ${product.price}
-          </p>
-
-          <!-- BUTTONS -->
-          <div class="product-buttons">
-
-            <button
-              class="view-btn"
-              onclick="viewProduct(${index})"
-            >
-              👁 View
-            </button>
-
-            <button
-              class="cart-btn"
-              onclick="addToCart(${index})"
-            >
-              🛒 Cart
-            </button>
-
-          </div>
-
-        </div>
+        <p>
+          ৳ ${product.price}
+        </p>
 
       </div>
-    `;
-  });
+
+    `).join("");
 }
-
-// ===============================
-// VIEW PRODUCT
-// ===============================
-
-function viewProduct(index) {
-
-  const products = getProducts();
-
-  const product = products[index];
-
-  localStorage.setItem(
-    "selectedProduct",
-    JSON.stringify(product)
-  );
-
-  location.href =
-    "pages/product-details.html";
-}
-
-// ===============================
-// ADD TO CART
-// ===============================
-
-function addToCart(index) {
-
-  // USER
-  const currentUser =
-    JSON.parse(
-      localStorage.getItem("currentUser")
-    );
-
-  // LOGIN CHECK
-  if (!currentUser) {
-
-    alert("Please login first!");
-
-    location.href =
-      "pages/login.html";
-
-    return;
-  }
-
-  // PRODUCTS
-  const products = getProducts();
-
-  const product = products[index];
-
-  // CART
-  let cart =
-    JSON.parse(
-      localStorage.getItem("cart")
-    ) || [];
-
-  // EXIST CHECK
-  const existingProduct =
-    cart.find(item =>
-
-      item.userEmail === currentUser.email &&
-
-      item.pname === product.pname
-    );
-
-  // IF EXISTS
-  if (existingProduct) {
-
-    existingProduct.qty += 1;
-
-    existingProduct.total =
-      existingProduct.qty *
-      Number(existingProduct.price);
-
-  } else {
-
-    // NEW PRODUCT
-    cart.push({
-
-      id: Date.now(),
-
-      pname: product.pname,
-
-      price: Number(product.price),
-
-      image: product.image,
-
-      qty: 1,
-
-      total: Number(product.price),
-
-      userEmail: currentUser.email
-    });
-  }
-
-  // SAVE
-  localStorage.setItem(
-    "cart",
-    JSON.stringify(cart)
-  );
-
-  alert("🛒 Product added to cart!");
-}
-
-// ===============================
-// SEARCH
-// ===============================
-
-const searchInput =
-  document.getElementById("search");
-
-if (searchInput) {
-
-  searchInput.addEventListener(
-    "input",
-    function () {
-
-      const value =
-        this.value.toLowerCase();
-
-      const products =
-        getProducts();
-
-      const filteredProducts =
-        products.filter(product =>
-
-          product.pname
-            .toLowerCase()
-            .includes(value)
-        );
-
-      renderProducts(filteredProducts);
-    }
-  );
-}
-
-// ===============================
-// INITIAL LOAD
-// ===============================
 
 document.addEventListener(
   "DOMContentLoaded",
-  function () {
-
-    renderProducts();
-  }
+  loadProducts
 );

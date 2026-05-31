@@ -7,129 +7,145 @@ import path from "path";
 
 // Routes
 import authRoutes from "./routes/authRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+// import cartRoutes from "./routes/cartRoutes.js";
+// import orderRoutes from "./routes/orderRoutes.js";
+//import userRoutes from "./routes/userRoutes.js";
 
 // Load Environment Variables
 dotenv.config();
 
-// Initialize Express App
+// Initialize App
 const app = express();
 
-// ======================================
+// =====================================
 // Middleware
-// ======================================
+// =====================================
 
 app.use(
-cors({
-origin:
-process.env.CLIENT_URL ||
-"http://127.0.0.1:5500",
-credentials: true
-})
+  cors({
+    origin:
+      process.env.CLIENT_URL ||
+      "http://127.0.0.1:5500",
+    credentials: true
+  })
 );
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Static Uploads Folder
+// Uploads Folder
 app.use(
-"/uploads",
-express.static(
-path.join(process.cwd(), "uploads")
-)
+  "/uploads",
+  express.static(
+    path.join(process.cwd(), "uploads")
+  )
 );
 
-// ======================================
+// =====================================
 // Routes
-// ======================================
+// =====================================
 
 // Root Route
 app.get("/", (req, res) => {
-res.status(200).json({
-success: true,
-message:
-"🌱 AgriLink Backend Running Successfully"
-});
+  res.status(200).json({
+    success: true,
+    message:
+      "🌱 AgriLink Backend Running Successfully"
+  });
 });
 
 // Health Check
 app.get("/api/health", (req, res) => {
-res.status(200).json({
-success: true,
-server: "running",
-database: "connected"
-});
+  res.status(200).json({
+    success: true,
+    server: "running",
+    database: "connected"
+  });
 });
 
-// Authentication Routes
-app.use(
-"/api/auth",
-authRoutes
-);
+// =====================================
+// API Routes
+// =====================================
 
-// ======================================
-// 404 Handler
-// ======================================
+app.use("/api/auth", authRoutes);
+
+app.use("/api/products", productRoutes);
+
+// app.use("/api/cart", cartRoutes);
+
+// app.use("/api/orders", orderRoutes);
+
+// app.use("/api/users", userRoutes);
+
+// =====================================
+// 404 Route Handler
+// =====================================
+
+// =====================================
+// 404 Route Handler
+// =====================================
 
 app.use((req, res) => {
-res.status(404).json({
-success: false,
-message: "Route Not Found"
-});
+
+  res.status(404).json({
+    success: false,
+    message: "Route Not Found"
+  });
+
 });
 
-// ======================================
+// =====================================
 // Global Error Handler
-// ======================================
+// =====================================
 
 app.use((err, req, res, next) => {
+  console.error(err);
 
-console.error(err);
-
-res.status(500).json({
-success: false,
-message: "Internal Server Error"
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message:
+      err.message ||
+      "Internal Server Error"
+  });
 });
 
-});
-
-// ======================================
+// =====================================
 // MongoDB Connection
-// ======================================
+// =====================================
 
 const PORT =
-process.env.PORT || 5000;
+  process.env.PORT || 5000;
 
 const startServer = async () => {
+  try {
 
-try {
+    await mongoose.connect(
+      process.env.MONGO_URI
+    );
 
-await mongoose.connect(
-  process.env.MONGO_URI
-);
+    console.log(
+      "✅ MongoDB Connected Successfully"
+    );
 
-console.log(
-  "✅ MongoDB Connected"
-);
+    app.listen(PORT, () => {
 
-app.listen(PORT, () => {
+      console.log(
+        `🚀 Server Running On http://localhost:${PORT}`
+      );
 
-  console.log(
-    `🚀 Server Running On http://localhost:${PORT}`
-  );
+    });
 
-});
+  } catch (error) {
 
-} catch (error) {
+    console.error(
+      "❌ Database Connection Failed:",
+      error.message
+    );
 
-console.error(
-  "❌ Database Connection Failed:",
-  error.message
-);
-
-process.exit(1);
-
-}
+    process.exit(1);
+  }
 };
 
 startServer();
