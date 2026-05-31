@@ -289,57 +289,107 @@
 <script src="js/app.js"></script>
 
 <!-- ================= PAGE SCRIPT ================= -->
-
 <script>
 
 // ================= USER =================
 
 const currentUser =
-  JSON.parse(localStorage.getItem("currentUser"));
+  JSON.parse(
+    localStorage.getItem(
+      "currentUser"
+    )
+  );
 
 // ELEMENTS
+
 const guestLinks =
-  document.getElementById("guestLinks");
+  document.getElementById(
+    "guestLinks"
+  );
 
 const userLinks =
-  document.getElementById("userLinks");
+  document.getElementById(
+    "userLinks"
+  );
 
 const farmerPanel =
-  document.getElementById("farmerPanel");
+  document.getElementById(
+    "farmerPanel"
+  );
 
 const productForm =
-  document.getElementById("productForm");
+  document.getElementById(
+    "productForm"
+  );
 
 const searchInput =
-  document.getElementById("search");
+  document.getElementById(
+    "search"
+  );
 
 // ================= NAVBAR STATE =================
 
-function updateNavbar(){
+function updateNavbar() {
 
-  if(currentUser){
+  if (currentUser) {
 
-    guestLinks.classList.add("hidden");
+    guestLinks.classList.add(
+      "hidden"
+    );
 
-    userLinks.classList.remove("hidden");
+    userLinks.classList.remove(
+      "hidden"
+    );
 
-    // FARMER PANEL
-    if(currentUser.role === "farmer"){
+    if (
+      currentUser.role ===
+      "farmer"
+    ) {
 
-      farmerPanel.classList.remove("hidden");
+      farmerPanel.classList.remove(
+        "hidden"
+      );
     }
 
   } else {
 
-    guestLinks.classList.remove("hidden");
+    guestLinks.classList.remove(
+      "hidden"
+    );
 
-    userLinks.classList.add("hidden");
+    userLinks.classList.add(
+      "hidden"
+    );
+  }
+}
+
+// ================= LOAD PRODUCTS =================
+
+async function loadProducts() {
+
+  try {
+
+    const response =
+      await fetch(
+        "http://localhost:5000/api/products"
+      );
+
+    const data =
+      await response.json();
+
+    renderProducts(
+      data.products
+    );
+
+  } catch (error) {
+
+    console.log(error);
   }
 }
 
 // ================= ADD PRODUCT =================
 
-if(productForm){
+if (productForm) {
 
   productForm.addEventListener(
     "submit",
@@ -347,73 +397,140 @@ if(productForm){
   );
 }
 
-function handleAddProduct(e){
+async function handleAddProduct(e) {
 
   e.preventDefault();
 
   const pname =
-    document.getElementById("pname")
-    .value
-    .trim();
+    document.getElementById(
+      "pname"
+    ).value.trim();
 
   const pprice =
-    document.getElementById("pprice")
-    .value
-    .trim();
+    document.getElementById(
+      "pprice"
+    ).value.trim();
 
   const pimage =
-    document.getElementById("pimage")
-    .files[0];
+    document.getElementById(
+      "pimage"
+    ).files[0];
 
-  // VALIDATION
-  if(!pname || !pprice || !pimage){
+  if (
+    !pname ||
+    !pprice ||
+    !pimage
+  ) {
 
-    alert("All fields required!");
+    alert(
+      "All fields required!"
+    );
 
     return;
   }
 
-  const reader =
-    new FileReader();
+  try {
 
-  reader.onload = function(event){
+    const formData =
+      new FormData();
 
-    const products =
-      JSON.parse(
-        localStorage.getItem("products")
-      ) || [];
-
-    // ADD PRODUCT
-    products.push({
-
-      pname: pname,
-
-      price: pprice,
-
-      image: event.target.result
-    });
-
-    // SAVE
-    localStorage.setItem(
-      "products",
-      JSON.stringify(products)
+    formData.append(
+      "pname",
+      pname
     );
 
-    // RESET
+    formData.append(
+      "price",
+      Number(pprice)
+    );
+
+    formData.append(
+      "description",
+      ""
+    );
+
+    formData.append(
+      "stock",
+      1
+    );
+
+    formData.append(
+      "category",
+      "Vegetable"
+    );
+
+    formData.append(
+      "image",
+      pimage
+    );
+
+    const token =
+      localStorage.getItem(
+        "token"
+      );
+
+    console.log(
+      "TOKEN:",
+      token
+    );
+
+    const response =
+      await fetch(
+        "http://localhost:5000/api/products",
+        {
+          method: "POST",
+
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          },
+
+          body: formData
+        }
+      );
+
+    const data =
+      await response.json();
+
+    console.log(
+      "STATUS:",
+      response.status
+    );
+
+    console.log(
+      "RESPONSE:",
+      data
+    );
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.message ||
+        "Product add failed"
+      );
+    }
+
+    alert(
+      "✅ Product Added Successfully"
+    );
+
     productForm.reset();
 
-    // RELOAD PRODUCTS
-    renderProducts();
+    loadProducts();
 
-    alert("✅ Product added successfully!");
-  };
+  } catch (error) {
 
-  reader.readAsDataURL(pimage);
+    console.error(error);
+
+    alert(
+      error.message
+    );
+  }
 }
 
 // ================= SEARCH =================
 
-if(searchInput){
+if (searchInput) {
 
   searchInput.addEventListener(
     "input",
@@ -421,34 +538,47 @@ if(searchInput){
   );
 }
 
-function handleSearch(){
+async function handleSearch() {
 
-  const value =
-    searchInput.value.toLowerCase();
+  try {
 
-  const products =
-    JSON.parse(
-      localStorage.getItem("products")
-    ) || [];
+    const value =
+      searchInput.value
+        .toLowerCase();
 
-  const filteredProducts =
-    products.filter(product =>
+    const response =
+      await fetch(
+        "http://localhost:5000/api/products"
+      );
 
-      product.pname
-        .toLowerCase()
-        .includes(value)
+    const data =
+      await response.json();
+
+    const filteredProducts =
+      data.products.filter(
+        product =>
+
+          product.pname
+            .toLowerCase()
+            .includes(
+              value
+            )
+      );
+
+    renderProducts(
+      filteredProducts
     );
 
-  renderProducts(filteredProducts);
+  } catch (error) {
+
+    console.log(error);
+  }
 }
 
 // ================= INIT =================
 
 updateNavbar();
 
-renderProducts();
+loadProducts();
 
 </script>
-
-</body>
-</html>
