@@ -126,13 +126,13 @@ const startServer = async () => {
     );
 
     console.log(
-      "✅ MongoDB Connected Successfully"
+      "MongoDB Connected Successfully"
     );
 
     app.listen(PORT, () => {
 
       console.log(
-        `🚀 Server Running On http://localhost:${PORT}`
+        `Server Running On http://localhost:${PORT}`
       );
 
     });
