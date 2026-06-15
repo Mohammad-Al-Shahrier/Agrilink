@@ -1,5 +1,7 @@
 import express from "express";
 import upload from "../middleware/uploadMiddleware.js";
+import protect from "../middleware/authMiddleware.js";
+
 import {
   createProduct,
   getAllProducts,
@@ -8,14 +10,11 @@ import {
   updateProduct,
   deleteProduct
 } from "../controllers/productController.js";
-import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", getAllProducts);
-router.get("/my-products", protect, getFarmerProducts);
-router.get("/:id", getSingleProduct);
-
+/* ==========================================
+   PUBLIC ROUTES
 router.post(
   "/",
   protect,
@@ -23,6 +22,7 @@ router.post(
   createProduct
 );
 
+// Update product
 router.put(
   "/:id",
   protect,
@@ -30,6 +30,7 @@ router.put(
   updateProduct
 );
 
+// Delete product
 router.delete(
   "/:id",
   protect,

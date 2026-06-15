@@ -1,584 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AgriLink — Buy fresh, organic vegetables and fruits directly from local farmers. Farm to home, 100% natural.">
   <title>AgriLink | Smart Agriculture</title>
-
-  <!-- CSS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/responsive.css">
-
 </head>
-
 <body>
 
-<!-- ================= NAVBAR ================= -->
-
+<!-- ===== NAVBAR ===== -->
 <nav class="navbar">
-
-  <!-- LOGO -->
-  <h2
-    class="logo"
-    onclick="goHome()"
-  >
-    🌱 AgriLink
-  </h2>
-
-  <!-- NAV LINKS -->
+  <h2 class="logo" onclick="goHome()">🌱 AgriLink</h2>
   <div class="nav-links">
-
-    <!-- GUEST -->
     <div id="guestLinks">
-
-      <a href="index.html">
-        Home
-      </a>
-
-      <a href="pages/login.html">
-        Sign In
-      </a>
-
-      <a
-        href="pages/register.html"
-        class="btn"
-      >
-        Sign Up
-      </a>
-
+      <a href="index.html">Home</a>
+      <a href="pages/login.html">Sign In</a>
+      <a href="pages/register.html" class="btn">Sign Up</a>
     </div>
-
-    <!-- USER -->
-    <div
-      id="userLinks"
-      class="hidden"
-    >
-
-      <a href="pages/profile.html">
-        👤 Profile
-      </a>
-
-      <a href="pages/dashboard.html">
-        📊 Dashboard
-      </a>
-
-      <a href="pages/cart.html">
-        🛒 Cart
-      </a>
-
-      <a href="pages/settings.html">
-        ⚙️ Settings
-      </a>
-
-      <a
-        href="#"
-        onclick="logout()"
-      >
-        🚪 Logout
-      </a>
-
+    <div id="userLinks" class="hidden">
+      <a href="pages/profile.html"> Profile</a>
+      <a href="pages/dashboard.html"> Dashboard</a>
+      <a href="pages/cart.html"> Cart</a>
+      <a href="pages/settings.html"> Settings</a>
+      <a href="#" onclick="logout()"> Logout</a>
     </div>
-
   </div>
-
 </nav>
 
-<!-- ================= MAIN ================= -->
-
+<!-- ===== MAIN ===== -->
 <main>
 
   <!-- HERO -->
-
   <section class="hero">
-
     <div class="hero-content">
+      <span class="hero-badge">🚜 Trusted by Local Farmers</span>
+      <h1>Fresh & Organic Vegetables 🥬</h1>
+      <p>Farm to Home | 100% Natural & Chemical Free</p>
+      <div class="hero-actions">
+        <a href="#productSection" class="hero-btn">🌿 Shop Now</a>
+        <a href="#whyUs" class="hero-btn-outline">Why AgriLink?</a>
+      </div>
 
-      <h1>
-        Fresh & Organic Vegetables 🥬
-      </h1>
-
-      <p>
-        Farm to Home | 100% Natural & Chemical Free
-      </p>
-
-      <a
-        href="#productSection"
-        class="hero-btn"
-      >
-        🌿 Shop Now
-      </a>
-
+      <div class="hero-stats">
+        <div class="stat">
+          <strong>500+</strong>
+          <span>Local Farmers</span>
+        </div>
+        <div class="stat">
+          <strong>10K+</strong>
+          <span>Happy Customers</span>
+        </div>
+        <div class="stat">
+          <strong>100%</strong>
+          <span>Organic Produce</span>
+        </div>
+      </div>
     </div>
-
   </section>
 
-  <!-- SEARCH -->
-
+  <!-- SEARCH + CATEGORY FILTER -->
   <section class="search-section">
-
     <div class="search-box">
-
       <input
         type="text"
         id="search"
-        placeholder="🔍 Search fresh products..."
+        placeholder=" Search fresh products..."
+        autocomplete="off"
       >
-
     </div>
 
+    <div class="category-chips" id="categoryChips">
+      <button type="button" class="chip active" data-category="All">All</button>
+      <button type="button" class="chip" data-category="Vegetable">🥦 Vegetable</button>
+      <button type="button" class="chip" data-category="Fruit">🍎 Fruit</button>
+      <button type="button" class="chip" data-category="Grain">🌾 Grain</button>
+      <button type="button" class="chip" data-category="Spice">🌶️ Spice</button>
+      <button type="button" class="chip" data-category="Other">📦 Other</button>
+    </div>
   </section>
 
-  <!-- FARMER PRODUCT PANEL -->
-
-  <section
-    id="farmerPanel"
-    class="farmer-panel hidden"
-  >
-
-    <h2>
-      Add Product 🧑‍🌾
-    </h2>
-
+  <!-- FARMER PANEL (visible to farmers only) -->
+  <section id="farmerPanel" class="farmer-panel hidden">
+    <h2>Add Product 🌾</h2>
     <form id="productForm">
-
-      <input
-        type="text"
-        id="pname"
-        placeholder="Product Name"
-        required
-      >
-
-      <input
-        type="number"
-        id="pprice"
-        placeholder="Price"
-        required
-      >
-
-      <input
-        type="file"
-        id="pimage"
-        accept="image/*"
-        required
-      >
-
-      <button type="submit">
-        ➕ Add Product
-      </button>
-
+      <input type="text"   id="pname"  placeholder="Product Name" required>
+      <input type="number" id="pprice" placeholder="Price (৳/kg)" required min="0">
+      <input type="number" id="pstock" placeholder="Stock (kg)"   min="0" value="1">
+      <select id="pcategory">
+        <option value="Vegetable">Vegetable</option>
+        <option value="Fruit">Fruit</option>
+        <option value="Grain">Grain</option>
+        <option value="Spice">Spice</option>
+        <option value="Other">Other</option>
+      </select>
+      <textarea id="pdesc" placeholder="Product description (optional)" rows="2"></textarea>
+      <input type="file"   id="pimage" accept="image/*" required>
+      <button type="submit">➕ Add Product</button>
     </form>
-
   </section>
 
   <!-- PRODUCTS -->
-
-  <section
-    id="productSection"
-    class="products-section"
-  >
-
+  <section id="productSection" class="products-section">
     <div class="section-title">
-
-      <h2>
-        Fresh Farm Products 🌿
-      </h2>
-
-      <p>
-        Organic vegetables directly from local farmers
-      </p>
-
+      <h2>Fresh Farm Products 🌿</h2>
+      <p>Organic vegetables directly from local farmers</p>
     </div>
+    <div id="productList" class="products">
+      <!-- Skeleton loader shown while fetching -->
+      <div class="skeleton-grid" id="skeletonGrid">
+        <div class="skel-card"><div class="skel skel-img"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div><div class="skel skel-btn"></div></div>
+        <div class="skel-card"><div class="skel skel-img"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div><div class="skel skel-btn"></div></div>
+        <div class="skel-card"><div class="skel skel-img"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div><div class="skel skel-btn"></div></div>
+        <div class="skel-card"><div class="skel skel-img"></div><div class="skel skel-line"></div><div class="skel skel-line short"></div><div class="skel skel-btn"></div></div>
+      </div>
+    </div>
+  </section>
 
-    <!-- PRODUCT LIST -->
-    <div
-      id="productList"
-      class="products"
-    ></div>
+  <!-- WHY CHOOSE US -->
+  <section id="whyUs" class="why-section">
+    <div class="section-title">
+      <h2>Why Choose AgriLink? 🌟</h2>
+      <p>Connecting farms directly to your kitchen</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">🚜</div>
+        <h3>Direct from Farmers</h3>
+        <p>No middlemen — products go straight from the farm to your doorstep.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🌱</div>
+        <h3>100% Organic</h3>
+        <p>Chemical-free, naturally grown produce for a healthier lifestyle.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">⚡</div>
+        <h3>Fast Delivery</h3>
+        <p>Fresh harvests delivered quickly so quality never drops.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">💰</div>
+        <h3>Fair Prices</h3>
+        <p>Better prices for customers, better income for farmers.</p>
+      </div>
+    </div>
+  </section>
 
+  <!-- NEWSLETTER / CTA -->
+  <section class="newsletter-section">
+    <div class="newsletter-content">
+      <h2>Stay Fresh with AgriLink 📩</h2>
+      <p>Get updates on new arrivals, seasonal produce and farmer stories.</p>
+      <form id="newsletterForm" class="newsletter-form">
+        <input type="email" id="newsletterEmail" placeholder="Enter your email" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
   </section>
 
 </main>
 
-<!-- ================= FOOTER ================= -->
-
+<!-- ===== FOOTER ===== -->
 <footer>
-
   <div class="footer-container">
-
-    <!-- BRAND -->
-
     <div class="footer-box">
-
-      <h2>
-        🌱 AgriLink
-      </h2>
-
-      <p>
-        Smart Agriculture platform connecting
-        farmers and customers directly.
-      </p>
-
+      <h2>🌱 AgriLink</h2>
+      <p>Smart Agriculture platform connecting farmers and customers directly.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Facebook">📘</a>
+        <a href="#" aria-label="Instagram">📸</a>
+        <a href="#" aria-label="Twitter">🐦</a>
+      </div>
     </div>
-
-    <!-- LINKS -->
-
     <div class="footer-box">
-
-      <h3>
-        Quick Links
-      </h3>
-
-      <a href="index.html">
-        Home
-      </a>
-
-      <a href="pages/dashboard.html">
-        Dashboard
-      </a>
-
-      <a href="pages/cart.html">
-        Cart
-      </a>
-
+      <h3>Quick Links</h3>
+      <a href="index.html">Home</a>
+      <a href="pages/dashboard.html">Dashboard</a>
+      <a href="pages/cart.html">Cart</a>
+      <a href="#whyUs">Why Us</a>
     </div>
-
-    <!-- SUPPORT -->
-
     <div class="footer-box">
-
-      <h3>
-        Support
-      </h3>
-
-      <a href="#">
-        Help Center
-      </a>
-
-      <a href="#">
-        Terms & Conditions
-      </a>
-
-      <a href="#">
-        Privacy Policy
-      </a>
-
+      <h3>Support</h3>
+      <a href="#">Help Center</a>
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Privacy Policy</a>
     </div>
-
   </div>
-
-  <!-- COPYRIGHT -->
-
-  <div class="footer-bottom">
-
-    © 2026 AgriLink | Smart Agriculture 🌱
-
-  </div>
-
+  <div class="footer-bottom">© 2026 AgriLink | Smart Agriculture 🌱</div>
 </footer>
 
-<!-- ================= JS FILES ================= -->
+<!-- BACK TO TOP -->
+<button id="backToTop" class="back-to-top" aria-label="Back to top">⬆</button>
 
+<!-- ===== SCRIPTS =====
+     ORDER MATTERS:
+     1. storage.js  — Storage helper
+     2. product.js  — renderProducts, loadProducts, filterAndRender, goToDetails, quickAddToCart
+     3. app.js      — navbar, search, logout, goHome (uses functions from product.js)
+===== -->
 <script src="js/storage.js"></script>
 <script src="js/product.js"></script>
 <script src="js/app.js"></script>
 
-<!-- ================= PAGE SCRIPT ================= -->
 <script>
+/* =====================================================
+   INDEX PAGE — Farmer: Add Product
+   All other logic (navbar, search, product loading)
+   is already handled by product.js + app.js
+===================================================== */
 
-// ================= USER =================
+const _API = "http://localhost:5000/api";
 
-const currentUser =
-  JSON.parse(
-    localStorage.getItem(
-      "currentUser"
-    )
-  );
-
-// ELEMENTS
-
-const guestLinks =
-  document.getElementById(
-    "guestLinks"
-  );
-
-const userLinks =
-  document.getElementById(
-    "userLinks"
-  );
-
-const farmerPanel =
-  document.getElementById(
-    "farmerPanel"
-  );
-
-const productForm =
-  document.getElementById(
-    "productForm"
-  );
-
-const searchInput =
-  document.getElementById(
-    "search"
-  );
-
-// ================= NAVBAR STATE =================
-
-function updateNavbar() {
-
-  if (currentUser) {
-
-    guestLinks.classList.add(
-      "hidden"
-    );
-
-    userLinks.classList.remove(
-      "hidden"
-    );
-
-    if (
-      currentUser.role ===
-      "farmer"
-    ) {
-
-      farmerPanel.classList.remove(
-        "hidden"
-      );
-    }
-
-  } else {
-
-    guestLinks.classList.remove(
-      "hidden"
-    );
-
-    userLinks.classList.add(
-      "hidden"
-    );
-  }
-}
-
-// ================= LOAD PRODUCTS =================
-
-async function loadProducts() {
-
-  try {
-
-    const response =
-      await fetch(
-        "http://localhost:5000/api/products"
-      );
-
-    const data =
-      await response.json();
-
-    renderProducts(
-      data.products
-    );
-
-  } catch (error) {
-
-    console.log(error);
-  }
-}
-
-// ================= ADD PRODUCT =================
+const productForm = document.getElementById("productForm");
 
 if (productForm) {
+  productForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  productForm.addEventListener(
-    "submit",
-    handleAddProduct
-  );
-}
-
-async function handleAddProduct(e) {
-
-  e.preventDefault();
-
-  const pname =
-    document.getElementById(
-      "pname"
-    ).value.trim();
-
-  const pprice =
-    document.getElementById(
-      "pprice"
-    ).value.trim();
-
-  const pimage =
-    document.getElementById(
-      "pimage"
-    ).files[0];
-
-  if (
-    !pname ||
-    !pprice ||
-    !pimage
-  ) {
-
-    alert(
-      "All fields required!"
-    );
-
-    return;
-  }
-
-  try {
-
-    const formData =
-      new FormData();
-
-    formData.append(
-      "pname",
-      pname
-    );
-
-    formData.append(
-      "price",
-      Number(pprice)
-    );
-
-    formData.append(
-      "description",
-      ""
-    );
-
-    formData.append(
-      "stock",
-      1
-    );
-
-    formData.append(
-      "category",
-      "Vegetable"
-    );
-
-    formData.append(
-      "image",
-      pimage
-    );
-
-    const token =
-      localStorage.getItem(
-        "token"
-      );
-
-    console.log(
-      "TOKEN:",
-      token
-    );
-
-    const response =
-      await fetch(
-        "http://localhost:5000/api/products",
-        {
-          method: "POST",
-
-          headers: {
-            Authorization:
-              `Bearer ${token}`
-          },
-
-          body: formData
-        }
-      );
-
-    const data =
-      await response.json();
-
-    console.log(
-      "STATUS:",
-      response.status
-    );
-
-    console.log(
-      "RESPONSE:",
-      data
-    );
-
-    if (!response.ok) {
-
-      throw new Error(
-        data.message ||
-        "Product add failed"
-      );
+    const authToken = localStorage.getItem("token");
+    if (!authToken) {
+      alert("You must be logged in to add products.");
+      return;
     }
 
-    alert(
-      "✅ Product Added Successfully"
-    );
+    const pname    = document.getElementById("pname").value.trim();
+    const pprice   = document.getElementById("pprice").value.trim();
+    const pstock   = document.getElementById("pstock")?.value.trim() || "1";
+    const pcategory= document.getElementById("pcategory")?.value || "Vegetable";
+    const pdesc    = document.getElementById("pdesc")?.value.trim() || "";
+    const pimage   = document.getElementById("pimage").files[0];
 
-    productForm.reset();
+    if (!pname || !pprice || !pimage) {
+      alert("Product name, price and image are required.");
+      return;
+    }
 
-    loadProducts();
+    const formData = new FormData();
+    formData.append("pname",       pname);
+    formData.append("price",       Number(pprice));
+    formData.append("stock",       Number(pstock));
+    formData.append("category",    pcategory);
+    formData.append("description", pdesc);
+    formData.append("image",       pimage);
 
-  } catch (error) {
+    const submitBtn = productForm.querySelector("button[type=submit]");
+    submitBtn.disabled   = true;
+    submitBtn.textContent = "Adding…";
 
-    console.error(error);
+    try {
+      const res  = await fetch(`${_API}/products`, {
+        method:  "POST",
+        headers: { Authorization: `Bearer ${authToken}` },
+        body:    formData
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to add product.");
 
-    alert(
-      error.message
-    );
-  }
+      alert(` "${pname}" added successfully!`);
+      productForm.reset();
+      loadProducts();   /* refresh grid — defined in product.js */
+
+    } catch (err) {
+      console.error("Add product error:", err);
+      alert(` ${err.message}`);
+    } finally {
+      submitBtn.disabled   = false;
+      submitBtn.textContent = "➕ Add Product";
+    }
+  });
 }
 
-// ================= SEARCH =================
-
-if (searchInput) {
-
-  searchInput.addEventListener(
-    "input",
-    handleSearch
-  );
-}
-
-async function handleSearch() {
-
-  try {
-
-    const value =
-      searchInput.value
-        .toLowerCase();
-
-    const response =
-      await fetch(
-        "http://localhost:5000/api/products"
-      );
-
-    const data =
-      await response.json();
-
-    const filteredProducts =
-      data.products.filter(
-        product =>
-
-          product.pname
-            .toLowerCase()
-            .includes(
-              value
-            )
-      );
-
-    renderProducts(
-      filteredProducts
-    );
-
-  } catch (error) {
-
-    console.log(error);
-  }
-}
-
-// ================= INIT =================
-
-updateNavbar();
-
-loadProducts();
+/* =====================================================
+   CATEGORY CHIPS
+   Filters products by category. Works with filterAndRender
+   if defined in product.js, otherwise falls back to a
+   simple client-side filter over #productList cards.
 
 </script>
