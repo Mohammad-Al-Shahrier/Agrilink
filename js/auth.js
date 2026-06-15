@@ -1,69 +1,93 @@
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL =
+"http://localhost:5000/api/auth";
 
-document
-.getElementById("registerForm")
-.addEventListener("submit", register);
+const registerForm =
+document.getElementById("registerForm");
 
-async function register(e) {
+if(registerForm){
 
-  e.preventDefault();
+registerForm.addEventListener(
+"submit",
+register
+);
 
-  const userData = {
+}
 
-    name:
-      document.getElementById("regName").value,
+async function register(e){
 
-    email:
-      document.getElementById("regEmail").value,
+e.preventDefault();
 
-    password:
-      document.getElementById("regPass").value,
+const userData = {
 
-    role:
-      document.getElementById("regRole").value,
+name:
+document.getElementById("regName").value.trim(),
 
-    farmName:
-      document.getElementById("farmName").value,
+email:
+document.getElementById("regEmail").value.trim(),
 
-    location:
-      document.getElementById("location").value,
+password:
+document.getElementById("regPass").value,
 
-    address:
-      document.getElementById("address").value
-  };
+role:
+document.getElementById("regRole").value,
 
-  try {
+farmName:
+document.getElementById("farmName")?.value || "",
 
-    const response = await fetch(
-      `${API_URL}/register`,
-      {
-        method: "POST",
+location:
+document.getElementById("location")?.value || "",
 
-        headers: {
-          "Content-Type": "application/json"
-        },
+address:
+document.getElementById("address")?.value || ""
 
-        body: JSON.stringify(userData)
-      }
-    );
+};
 
-    const data = await response.json();
+try{
 
-    if (!response.ok) {
+const response =
+await fetch(
+`${API_URL}/register`,
+{
+method:"POST",
 
-      alert(data.message);
+headers:{
+"Content-Type":"application/json"
+},
 
-      return;
-    }
+body:JSON.stringify(userData)
+}
+);
 
-    alert("Registration Successful");
+const data =
+await response.json();
 
-    window.location.href = "login.html";
+if(!response.ok){
 
-  } catch (error) {
+alert(data.message);
 
-    console.log(error);
+return;
+}
 
-    alert("Server Error");
-  }
+localStorage.setItem(
+"token",
+data.token
+);
+
+localStorage.setItem(
+"currentUser",
+JSON.stringify(data.user)
+);
+
+alert("Registration Successful");
+
+window.location.href =
+"login.html";
+
+}catch(error){
+
+console.log(error);
+
+alert("Server Error");
+
+}
 }

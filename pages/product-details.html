@@ -1,489 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Product Details | AgriLink</title>
-
-<link rel="stylesheet" href="../css/style.css">
-<link rel="stylesheet" href="../css/responsive.css">
-
-<style>
-
-/* ================= PRODUCT DETAILS ================= */
-
-.product-details{
-
-    width:90%;
-    max-width:1200px;
-    margin:50px auto;
-
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:50px;
-    align-items:center;
-}
-
-/* IMAGE */
-
-.product-image{
-
-    background:white;
-    border-radius:20px;
-    overflow:hidden;
-
-    box-shadow:0 5px 15px rgba(0,0,0,0.1);
-}
-
-.product-image img{
-
-    width:100%;
-    height:500px;
-    object-fit:cover;
-}
-
-/* INFO */
-
-.product-info h1{
-
-    font-size:42px;
-    margin-bottom:15px;
-}
-
-.product-price{
-
-    font-size:35px;
-    color:#2e7d32;
-    font-weight:700;
-
-    margin-bottom:20px;
-}
-
-.product-desc{
-
-    color:#666;
-    line-height:1.8;
-
-    margin-bottom:30px;
-}
-
-/* QUANTITY */
-
-.qty-wrapper{
-
-    display:flex;
-    align-items:center;
-    gap:15px;
-
-    margin-bottom:25px;
-}
-
-.qty-btn{
-
-    width:45px;
-    height:45px;
-
-    border:none;
-    border-radius:50%;
-
-    background:#2e7d32;
-    color:white;
-
-    font-size:22px;
-    cursor:pointer;
-
-    transition:0.3s;
-}
-
-.qty-btn:hover{
-
-    background:#1b5e20;
-}
-
-.qty{
-
-    font-size:24px;
-    font-weight:700;
-}
-
-/* TOTAL */
-
-.total-price{
-
-    font-size:28px;
-    font-weight:700;
-    color:#111;
-
-    margin-bottom:30px;
-}
-
-/* BUTTONS */
-
-.action-buttons{
-
-    display:flex;
-    gap:20px;
-    flex-wrap:wrap;
-}
-
-.buy-btn,
-.cart-btn{
-
-    padding:15px 30px;
-
-    border:none;
-    border-radius:40px;
-
-    font-size:17px;
-    font-weight:600;
-
-    cursor:pointer;
-
-    transition:0.3s;
-}
-
-.buy-btn{
-
-    background:#76ff03;
-    color:#111;
-}
-
-.buy-btn:hover{
-
-    transform:translateY(-3px);
-}
-
-.cart-btn{
-
-    background:#2e7d32;
-    color:white;
-}
-
-.cart-btn:hover{
-
-    background:#1b5e20;
-}
-
-/* RESPONSIVE */
-
-@media(max-width:768px){
-
-    .product-details{
-
-        grid-template-columns:1fr;
-    }
-
-    .product-info h1{
-
-        font-size:32px;
-    }
-
-    .product-image img{
-
-        height:350px;
-    }
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | AgriLink</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/product-details.css">
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-
+<!-- ===== NAVBAR (same as index.html) ===== -->
 <nav class="navbar">
-
-    <h2 class="logo" onclick="goHome()">
-        🌱 AgriLink
-    </h2>
-
-    <div class="nav-links">
-
-        <a href="../index.html">Home</a>
-        <a href="dashboard.html">Dashboard</a>
-        <a href="cart.html">Cart 🛒</a>
-
+  <h2 class="logo" onclick="goHome()">🌱 AgriLink</h2>
+  <div class="nav-links">
+    <div id="guestLinks">
+      <a href="../index.html">Home</a>
+      <a href="login.html">Sign In</a>
+      <a href="register.html" class="btn">Sign Up</a>
     </div>
-
+    <div id="userLinks" class="hidden">
+      <a href="profile.html">👤 Profile</a>
+      <a href="dashboard.html">📊 Dashboard</a>
+      <a href="cart.html">🛒 Cart</a>
+      <a href="settings.html">⚙️ Settings</a>
+      <a href="#" onclick="logout()">🚪 Logout</a>
+    </div>
+  </div>
 </nav>
 
-<!-- ================= PRODUCT DETAILS ================= -->
+<section class="details-container">
 
-<section class="product-details">
+    <a href="../index.html" class="back-link">← Back to Products</a>
 
-    <!-- IMAGE -->
-
-    <div class="product-image">
-
-        <img id="productImage">
-
-    </div>
-
-    <!-- INFO -->
-
-    <div class="product-info">
-
-        <h1 id="productName"></h1>
-
-        <div class="product-price">
-            ৳ <span id="productPrice"></span>
+    <div id="productDetails">
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading product details...</p>
         </div>
-
-        <p class="product-desc">
-
-            Fresh organic vegetables directly from local farmers.
-            Healthy, chemical-free and farm fresh products for your family.
-
-        </p>
-
-        <!-- QUANTITY -->
-
-        <div class="qty-wrapper">
-
-            <button class="qty-btn" onclick="decreaseQty()">
-                -
-            </button>
-
-            <div class="qty" id="qty">
-                1
-            </div>
-
-            <button class="qty-btn" onclick="increaseQty()">
-                +
-            </button>
-
-        </div>
-
-        <!-- TOTAL -->
-
-        <div class="total-price">
-
-            Total: ৳ <span id="totalPrice"></span>
-
-        </div>
-
-        <!-- BUTTONS -->
-
-        <div class="action-buttons">
-
-            <button class="cart-btn" onclick="addToCart()">
-
-                🛒 Add To Cart
-
-            </button>
-
-            <button class="buy-btn" onclick="buyNow()">
-
-                ⚡ Buy Now
-
-            </button>
-
-        </div>
-
     </div>
 
 </section>
 
+<!-- ===== FOOTER (same as index.html) ===== -->
+<footer>
+  <div class="footer-container">
+    <div class="footer-box">
+      <h2>🌱 AgriLink</h2>
+      <p>Smart Agriculture platform connecting farmers and customers directly.</p>
+    </div>
+    <div class="footer-box">
+      <h3>Quick Links</h3>
+      <a href="../index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="cart.html">Cart</a>
+    </div>
+    <div class="footer-box">
+      <h3>Support</h3>
+      <a href="#">Help Center</a>
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 AgriLink | Smart Agriculture 🌱</div>
+</footer>
+
+<!-- ORDER MATTERS: storage -> product -> app (navbar/logout/goHome) -> product-details (page logic) -->
+<script src="../js/storage.js"></script>
+<script src="../js/product.js"></script>
 <script src="../js/app.js"></script>
-
-<script>
-
-// ================= GET PRODUCT =================
-
-const product = JSON.parse(
-    localStorage.getItem("selectedProduct")
-);
-
-// IF NO PRODUCT
-if(!product){
-
-    location.href = "../index.html";
-}
-
-// ================= DOM =================
-
-const productImage =
-    document.getElementById("productImage");
-
-const productName =
-    document.getElementById("productName");
-
-const productPrice =
-    document.getElementById("productPrice");
-
-const totalPrice =
-    document.getElementById("totalPrice");
-
-const qtyText =
-    document.getElementById("qty");
-
-// ================= SET DATA =================
-
-productImage.src = product.image;
-
-productName.innerText = product.pname;
-
-productPrice.innerText = product.price;
-
-// ================= QUANTITY =================
-
-let qty = 1;
-
-// INITIAL TOTAL
-updateTotal();
-
-// INCREASE
-function increaseQty(){
-
-    qty++;
-
-    qtyText.innerText = qty;
-
-    updateTotal();
-}
-
-// DECREASE
-function decreaseQty(){
-
-    if(qty > 1){
-
-        qty--;
-
-        qtyText.innerText = qty;
-
-        updateTotal();
-    }
-}
-
-// ================= TOTAL =================
-
-function updateTotal(){
-
-    const total =
-        qty * Number(product.price);
-
-    totalPrice.innerText = total;
-}
-
-// ================= ADD TO CART =================
-
-function addToCart(){
-
-    const user = JSON.parse(
-        localStorage.getItem("currentUser")
-    );
-
-    // LOGIN CHECK
-    if(!user){
-
-        alert("Please login first!");
-
-        location.href = "login.html";
-
-        return;
-    }
-
-    let cart =
-        JSON.parse(localStorage.getItem("cart")) || [];
-
-    // CHECK EXISTING PRODUCT
-    const existingProduct = cart.find(item =>
-
-        item.pname === product.pname &&
-        item.userEmail === user.email
-    );
-
-    // UPDATE EXISTING
-    if(existingProduct){
-
-        existingProduct.qty += qty;
-
-        existingProduct.total =
-            existingProduct.qty *
-            Number(existingProduct.price);
-
-    } else {
-
-        // NEW PRODUCT
-        cart.push({
-
-            ...product,
-
-            qty: qty,
-
-            total: qty * Number(product.price),
-
-            userEmail: user.email
-        });
-    }
-
-    // SAVE
-    localStorage.setItem(
-        "cart",
-        JSON.stringify(cart)
-    );
-
-    alert("🛒 Product added to cart!");
-}
-
-// ================= BUY NOW =================
-
-function buyNow(){
-
-    const user = JSON.parse(
-        localStorage.getItem("currentUser")
-    );
-
-    // LOGIN CHECK
-    if(!user){
-
-        alert("Please login first!");
-
-        location.href = "login.html";
-
-        return;
-    }
-
-    let orders =
-        JSON.parse(localStorage.getItem("orders")) || [];
-
-    // CREATE ORDER
-    orders.push({
-
-        pname: product.pname,
-
-        price: product.price,
-
-        image: product.image,
-
-        qty: qty,
-
-        total: qty * Number(product.price),
-
-        userEmail: user.email,
-
-        status: "Pending",
-
-        date: new Date().toLocaleString()
-    });
-
-    // SAVE ORDER
-    localStorage.setItem(
-        "orders",
-        JSON.stringify(orders)
-    );
-
-    // POPUP
-    alert("✅ Order Confirmed!");
-
-    // REDIRECT
-    location.href = "dashboard.html";
-}
-
-</script>
+<script src="../js/product-details.js"></script>
 
 </body>
 </html>

@@ -2,241 +2,176 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// ======================================
-// REGISTER USER
-// ======================================
+// REGISTER
 
-export const registerUser = async (req, res) => {
-  try {
-    const {
-      name,
-      email,
-      password,
-      role,
-      farmName,
-      location,
-      address
-    } = req.body;
+export const registerUser = async (req,res)=>{
 
-    // ===============================
-    // VALIDATION
-    // ===============================
+try{
 
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, Email and Password are required"
-      });
-    }
+const {
+  name,
+  email,
+  password,
+  role,
+  farmName,
+  location,
+  address
+}=req.body;
 
-    // ===============================
-    // CHECK EXISTING USER
-    // ===============================
+if(!name || !email || !password){
 
-    const existingUser = await User.findOne({
-      email
-    });
+  return res.status(400).json({
+    success:false,
+    message:"All required fields missing"
+  });
+}
 
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "User already exists"
-      });
-    }
+const existingUser =
+await User.findOne({email});
 
-    // ===============================
-    // HASH PASSWORD
-    // ===============================
+if(existingUser){
 
-    const salt = await bcrypt.genSalt(10);
+  return res.status(400).json({
+    success:false,
+    message:"Email already registered"
+  });
+}
 
-    const hashedPassword =
-      await bcrypt.hash(password, salt);
+const hashedPassword =
+await bcrypt.hash(password,10);
 
-    // ===============================
-    // CREATE USER
-    // ===============================
+const user =
+await User.create({
 
-    const newUser = await User.create({
-      name,
-      email,
-      password: hashedPassword,
+  name,
+  email,
+  password:hashedPassword,
+  role,
 
-      role: role || "customer",
+  farmName:
+  role==="farmer" ? farmName : "",
 
-      farmName:
-        role === "farmer"
-          ? farmName
-          : "",
+  location:
+  role==="farmer" ? location : "",
 
-      location:
-        role === "farmer"
-          ? location
-          : "",
+  address:
+  role==="customer" ? address : ""
 
-      address:
-        role === "customer"
-          ? address
-          : ""
-    });
+});
 
-    // ===============================
-    // GENERATE JWT TOKEN
-    // ===============================
+const token = jwt.sign(
+{
+  id:user._id,
+  role:user.role
+},
+process.env.JWT_SECRET,
+{
+  expiresIn:"7d"
+}
+);
 
-    const token = jwt.sign(
-      {
-        id: newUser._id,
-        email: newUser.email,
-        role: newUser.role
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d"
-      }
-    );
+res.cookie("token",token,{
+  httpOnly:true,
+  maxAge:7*24*60*60*1000
+});
 
-    // ===============================
-    // RESPONSE
-    // ===============================
+res.status(201).json({
 
-    res.status(201).json({
-      success: true,
-      message: "Registration Successful",
+  success:true,
+  message:"Registration Successful",
 
-      token,
+  token,
 
-      user: {
-        id: newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        farmName: newUser.farmName,
-        location: newUser.location,
-        address: newUser.address,
-        profileImage:
-          newUser.profileImage
-      }
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-      error: error.message
-    });
+  user:{
+    id:user._id,
+    name:user.name,
+    email:user.email,
+    role:user.role
   }
+});
+
+}catch(error){
+
+console.log(error);
+
+res.status(500).json({
+  success:false,
+  message:error.message
+});
+
+}
 };
 
-// ======================================
-// LOGIN USER
-// ======================================
+// LOGIN
 
-export const loginUser = async (req, res) => {
+export const loginUser = async (req,res)=>{
 
-  try {
+try{
 
-    const {
-      email,
-      password
-    } = req.body;
+const {email,password}=req.body;
 
-    // ===============================
-    // VALIDATION
-    // ===============================
+const user =
+await User.findOne({email});
 
-    if (!email || !password) {
+if(!user){
 
-      return res.status(400).json({
-        success: false,
-        message:
-          "Email and Password required"
-      });
-    }
+  return res.status(404).json({
+    success:false,
+    message:"User not found"
+  });
+}
 
-    // ===============================
-    // FIND USER
-    // ===============================
+const match =
+await bcrypt.compare(
+password,
+user.password
+);
 
-    const user =
-      await User.findOne({ email });
+if(!match){
 
-    if (!user) {
+  return res.status(401).json({
+    success:false,
+    message:"Invalid Password"
+  });
+}
 
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
-    }
+const token = jwt.sign(
+{
+  id:user._id,
+  role:user.role
+},
+process.env.JWT_SECRET,
+{
+  expiresIn:"7d"
+}
+);
 
-    // ===============================
-    // CHECK PASSWORD
-    // ===============================
+res.cookie("token",token,{
+  httpOnly:true,
+  maxAge:7*24*60*60*1000
+});
 
-    const isMatch =
-      await bcrypt.compare(
-        password,
-        user.password
-      );
+res.status(200).json({
 
-    if (!isMatch) {
+  success:true,
+  message:"Login Successful",
 
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials"
-      });
-    }
+  token,
 
-    // ===============================
-    // GENERATE TOKEN
-    // ===============================
-
-    const token = jwt.sign(
-      {
-        id: user._id,
-        email: user.email,
-        role: user.role
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d"
-      }
-    );
-
-    // ===============================
-    // RESPONSE
-    // ===============================
-
-    res.status(200).json({
-      success: true,
-      message: "Login Successful",
-
-      token,
-
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        farmName: user.farmName,
-        location: user.location,
-        address: user.address,
-        profileImage:
-          user.profileImage
-      }
-    });
-
-  } catch (error) {
-
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-      error: error.message
-    });
+  user:{
+    id:user._id,
+    name:user.name,
+    email:user.email,
+    role:user.role
   }
+});
+
+}catch(error){
+
+res.status(500).json({
+  success:false,
+  message:error.message
+});
+
+}
 };
