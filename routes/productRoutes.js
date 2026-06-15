@@ -15,27 +15,6 @@ const router = express.Router();
 
 /* ==========================================
    PUBLIC ROUTES
-========================================== */
-
-// Get all products
-router.get("/", getAllProducts);
-
-// Get single product details
-router.get("/:id", getSingleProduct);
-
-
-/* ==========================================
-   PROTECTED ROUTES
-========================================== */
-
-// Get logged-in farmer's products
-router.get(
-  "/my-products",
-  protect,
-  getFarmerProducts
-);
-
-// Add product
 router.post(
   "/",
   protect,
