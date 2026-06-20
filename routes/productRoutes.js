@@ -15,27 +15,6 @@ const router = express.Router();
 
 /* ==========================================
    PUBLIC ROUTES
-========================================== */
-
-// Get all products
-router.get("/", getAllProducts);
-
-// ✅ MUST come before /:id — otherwise Express
-//    treats "my-products" as an :id param
-router.get(
-  "/my-products",
-  protect,
-  getFarmerProducts
-);
-
-// Get single product by ID
-router.get("/:id", getSingleProduct);
-
-/* ==========================================
-   PROTECTED ROUTES
-========================================== */
-
-// Add product
 router.post(
   "/",
   protect,
