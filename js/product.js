@@ -1,238 +1,188 @@
-// ===============================
-// GET PRODUCTS
-// ===============================
+const API_BASE = "http://localhost:5000";
 
-function getProducts() {
+let _allProducts = [];
 
-  return JSON.parse(
-    localStorage.getItem("products")
-  ) || [];
+async function loadProducts(query = "") {
+  try {
+    const response = await fetch(`${API_BASE}/api/products`);
+    if (!response.ok) throw new Error(`Server error: ${response.status}`);
+    const data = await response.json();
+    _allProducts = data.products || data || [];
+    filterAndRender(query);
+  } catch (error) {
+    console.error("Failed to load products:", error);
+    renderProducts([]);
+  }
 }
 
-// ===============================
-// RENDER PRODUCTS
-// ===============================
+function filterAndRender(query = "", category = "All") {
+  let filtered = _allProducts;
 
-function renderProducts(list = null) {
+  if (query.trim()) {
+    const q = query.toLowerCase();
+    filtered = filtered.filter(p =>
+      (p.pname || p.name || "").toLowerCase().includes(q) ||
+      (p.category || "").toLowerCase().includes(q)
+    );
+  }
 
-  const container =
-    document.getElementById("productList");
+  if (category && category !== "All") {
+    filtered = filtered.filter(p => p.category === category);
+  }
 
+  renderProducts(filtered);
+}
+
+function renderProducts(products = []) {
+  const container = document.getElementById("productList");
   if (!container) return;
 
-  const products =
-    list || getProducts();
-
-  container.innerHTML = "";
-
-  // EMPTY PRODUCTS
-  if (products.length === 0) {
-
+  if (!products || !products.length) {
     container.innerHTML = `
-
       <div class="empty-products">
-
-        <h2>
-          No Products Available 😔
-        </h2>
-
-      </div>
-    `;
-
+        <div class="empty-icon">🌿</div>
+        <h2>No products found</h2>
+        <p>Try a different search term or check back later.</p>
+      </div>`;
     return;
   }
 
-  // LOOP PRODUCTS
-  products.forEach((product, index) => {
+  const inPagesFolder = window.location.pathname.includes("/pages/");
+  const detailsPath   = inPagesFolder ? "product-details.html" : "pages/product-details.html";
+  const fallbackImg   = inPagesFolder ? "../images/placeholder.jpg" : "images/placeholder.jpg";
 
-    container.innerHTML += `
+  container.innerHTML = products.map(product => {
+    const id       = product._id || product.id || "";
+    const name     = product.pname || product.name || "Unnamed";
+    const price    = Number(product.price || 0).toLocaleString("en-BD");
+    const unit     = product.unit || "kg";
+    const category = product.category || "Vegetable";
+    const stock    = Number(product.stock ?? product.quantity ?? 0);
 
-      <div class="card">
+    let imageUrl = fallbackImg;
+    if (product.image) {
+      imageUrl = product.image.startsWith("http")
+        ? product.image
+        : `${API_BASE}/${product.image.replace(/^\/+/, "")}`;
+    }
 
-        <!-- IMAGE -->
-        <img
-          src="${product.image}"
-          alt="${product.pname}"
-        >
+    let stockPill = `<span class="stock-pill in">In stock</span>`;
+    if (stock === 0) {
+      stockPill = `<span class="stock-pill out">Out of stock</span>`;
+    } else if (stock <= 10) {
+      stockPill = `<span class="stock-pill low">Only ${stock} left</span>`;
+    }
 
-        <!-- BODY -->
+    const safeId   = String(id);
+    const safeName = name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
+    return `
+      <div
+        class="card"
+        onclick="goToDetails('${safeId}')"
+        role="button"
+        tabindex="0"
+        aria-label="View details for ${name}"
+        onkeydown="if(event.key==='Enter') goToDetails('${safeId}')"
+        style="cursor:pointer"
+        data-category="${category}"
+      >
+        <div class="card-img-wrap">
+          <img
+            src="${imageUrl}"
+            alt="${name}"
+            loading="lazy"
+            onerror="this.src='${fallbackImg}'; this.onerror=null;"
+          >
+          ${stockPill}
+        </div>
+
         <div class="card-body">
+          <span class="category-tag">${category}</span>
+          <h3 class="card-name">${name}</h3>
+          <p class="price">৳${price}<span> / ${unit}</span></p>
 
-          <h3>
-            ${product.pname}
-          </h3>
-
-          <p class="price">
-            ৳ ${product.price}
-          </p>
-
-          <!-- BUTTONS -->
           <div class="product-buttons">
-
             <button
               class="view-btn"
-              onclick="viewProduct(${index})"
+              onclick="event.stopPropagation(); goToDetails('${safeId}')"
+              aria-label="View ${name}"
             >
-              👁 View
+              👁 Details
             </button>
 
             <button
               class="cart-btn"
-              onclick="addToCart(${index})"
+              onclick="event.stopPropagation(); quickAddToCart('${safeId}', '${safeName}', this)"
+              ${stock === 0 ? "disabled" : ""}
+              aria-label="Add ${name} to cart"
             >
-              🛒 Cart
+              🛒 Add to Cart
             </button>
-
           </div>
-
         </div>
-
-      </div>
-    `;
-  });
+      </div>`;
+  }).join("");
 }
 
-// ===============================
-// VIEW PRODUCT
-// ===============================
-
-function viewProduct(index) {
-
-  const products = getProducts();
-
-  const product = products[index];
-
-  localStorage.setItem(
-    "selectedProduct",
-    JSON.stringify(product)
-  );
-
-  location.href =
-    "pages/product-details.html";
+function goToDetails(productId) {
+  if (!productId) return;
+  const inPagesFolder = window.location.pathname.includes("/pages/");
+  const url = inPagesFolder
+    ? `product-details.html?id=${productId}`
+    : `pages/product-details.html?id=${productId}`;
+  window.location.href = url;
 }
 
-// ===============================
-// ADD TO CART
-// ===============================
+async function quickAddToCart(productId, productName, btn) {
+  const token       = localStorage.getItem("token");
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
 
-function addToCart(index) {
-
-  // USER
-  const currentUser =
-    JSON.parse(
-      localStorage.getItem("currentUser")
-    );
-
-  // LOGIN CHECK
-  if (!currentUser) {
-
-    alert("Please login first!");
-
-    location.href =
-      "pages/login.html";
-
+  if (!currentUser || !token) {
+    alert("Please sign in to add items to your cart.");
+    const inPagesFolder = window.location.pathname.includes("/pages/");
+    window.location.href = inPagesFolder ? "login.html" : "pages/login.html";
     return;
   }
 
-  // PRODUCTS
-  const products = getProducts();
+  const original = btn.innerHTML;
+  btn.disabled   = true;
+  btn.innerHTML  = "Adding…";
 
-  const product = products[index];
-
-  // CART
-  let cart =
-    JSON.parse(
-      localStorage.getItem("cart")
-    ) || [];
-
-  // EXIST CHECK
-  const existingProduct =
-    cart.find(item =>
-
-      item.userEmail === currentUser.email &&
-
-      item.pname === product.pname
-    );
-
-  // IF EXISTS
-  if (existingProduct) {
-
-    existingProduct.qty += 1;
-
-    existingProduct.total =
-      existingProduct.qty *
-      Number(existingProduct.price);
-
-  } else {
-
-    // NEW PRODUCT
-    cart.push({
-
-      id: Date.now(),
-
-      pname: product.pname,
-
-      price: Number(product.price),
-
-      image: product.image,
-
-      qty: 1,
-
-      total: Number(product.price),
-
-      userEmail: currentUser.email
+  try {
+    const res = await fetch(`${API_BASE}/api/cart`, {
+      method:  "POST",
+      headers: {
+        "Content-Type":  "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ productId, quantity: 1 })
     });
-  }
 
-  // SAVE
-  localStorage.setItem(
-    "cart",
-    JSON.stringify(cart)
-  );
-
-  alert("🛒 Product added to cart!");
-}
-
-// ===============================
-// SEARCH
-// ===============================
-
-const searchInput =
-  document.getElementById("search");
-
-if (searchInput) {
-
-  searchInput.addEventListener(
-    "input",
-    function () {
-
-      const value =
-        this.value.toLowerCase();
-
-      const products =
-        getProducts();
-
-      const filteredProducts =
-        products.filter(product =>
-
-          product.pname
-            .toLowerCase()
-            .includes(value)
-        );
-
-      renderProducts(filteredProducts);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || "Failed to add to cart");
     }
-  );
+
+    btn.innerHTML        = "✅ Added!";
+    btn.style.background = "#2e7d32";
+    btn.style.color      = "#fff";
+
+    setTimeout(() => {
+      btn.innerHTML        = original;
+      btn.style.background = "";
+      btn.style.color      = "";
+      btn.disabled         = false;
+    }, 2000);
+
+  } catch (error) {
+    console.error("Cart error:", error);
+    btn.innerHTML = "❌ Failed";
+    setTimeout(() => {
+      btn.innerHTML = original;
+      btn.disabled  = false;
+    }, 2000);
+  }
 }
 
-// ===============================
-// INITIAL LOAD
-// ===============================
-
-document.addEventListener(
-  "DOMContentLoaded",
-  function () {
-
-    renderProducts();
-  }
-);
+document.addEventListener("DOMContentLoaded", () => loadProducts());

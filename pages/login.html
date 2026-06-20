@@ -4,6 +4,7 @@
 <head>
 
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
@@ -24,9 +25,7 @@
 
       <h1>🌱 AgriLink</h1>
 
-      <p>
-        Welcome Back
-      </p>
+      <p>Welcome Back</p>
 
     </div>
 
@@ -97,15 +96,43 @@
 
       const email =
         document
-        .getElementById("loginEmail")
-        .value
-        .trim();
+          .getElementById("loginEmail")
+          .value
+          .trim();
 
       const password =
         document
-        .getElementById("loginPass")
-        .value
-        .trim();
+          .getElementById("loginPass")
+          .value
+          .trim();
+
+      // ======================
+      // Frontend Validation
+      // ======================
+
+      if (!email) {
+
+        alert("Email is required");
+
+        return;
+      }
+
+      const emailRegex =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(email)) {
+
+        alert("Please enter a valid email");
+
+        return;
+      }
+
+      if (!password) {
+
+        alert("Password is required");
+
+        return;
+      }
 
       try {
 
@@ -117,7 +144,7 @@
 
               headers: {
                 "Content-Type":
-                "application/json"
+                  "application/json"
               },
 
               body: JSON.stringify({
@@ -132,22 +159,38 @@
 
         if (!response.ok) {
 
-          alert(
-            data.message ||
-            "Login failed"
-          );
+          // Zod Validation Errors
+          if (data.errors) {
+
+            const messages =
+              data.errors
+                .map(error =>
+                  error.message
+                )
+                .join("\n");
+
+            alert(messages);
+
+          } else {
+
+            alert(
+              data.message ||
+              "Login failed"
+            );
+
+          }
 
           return;
         }
 
-        // JWT Token Save
+        // Save JWT Token
 
         localStorage.setItem(
           "token",
           data.token
         );
 
-        // User Save
+        // Save User Info
 
         localStorage.setItem(
           "currentUser",
@@ -155,7 +198,7 @@
         );
 
         alert(
-          "Login Successful"
+          "✅ Login Successful"
         );
 
         window.location.href =
@@ -168,7 +211,7 @@
         console.error(error);
 
         alert(
-          "Server Error"
+          "❌ Server Error"
         );
       }
     }

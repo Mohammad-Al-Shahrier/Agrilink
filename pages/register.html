@@ -59,7 +59,7 @@
         <input
           type="password"
           id="regPass"
-          placeholder="Enter password"
+          placeholder="Minimum 6 characters"
           required
         >
 
@@ -87,7 +87,7 @@
 
       </div>
 
-      <!-- FARMER FIELDS -->
+      <!-- FARMER -->
       <div
         id="farmerFields"
         style="display:none;"
@@ -119,7 +119,7 @@
 
       </div>
 
-      <!-- CUSTOMER FIELDS -->
+      <!-- CUSTOMER -->
       <div id="customerFields">
 
         <div class="input-group">
@@ -136,7 +136,6 @@
 
       </div>
 
-      <!-- BUTTON -->
       <button
         type="submit"
         class="auth-btn"
@@ -160,9 +159,8 @@
 
   <script>
 
-    // ==========================
-    // TOGGLE ROLE FIELDS
-    // ==========================
+    const API_URL =
+      "http://localhost:5000/api/auth";
 
     function toggleFields() {
 
@@ -199,10 +197,6 @@
       }
     }
 
-    // ==========================
-    // REGISTER USER
-    // ==========================
-
     document
       .getElementById("registerForm")
       .addEventListener(
@@ -219,54 +213,109 @@
           "regRole"
         ).value;
 
+      const name =
+        document.getElementById(
+          "regName"
+        ).value.trim();
+
+      const email =
+        document.getElementById(
+          "regEmail"
+        ).value.trim();
+
+      const password =
+        document.getElementById(
+          "regPass"
+        ).value.trim();
+
+      const farmName =
+        document.getElementById(
+          "farmName"
+        ).value.trim();
+
+      const location =
+        document.getElementById(
+          "location"
+        ).value.trim();
+
+      const address =
+        document.getElementById(
+          "address"
+        ).value.trim();
+
+      // Frontend Validation
+
+      if (name.length < 3) {
+
+        alert(
+          "Name must be at least 3 characters."
+        );
+
+        return;
+      }
+
+      const emailRegex =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(email)) {
+
+        alert(
+          "Please enter a valid email."
+        );
+
+        return;
+      }
+
+      if (password.length < 6) {
+
+        alert(
+          "Password must be at least 6 characters."
+        );
+
+        return;
+      }
+
+      if (
+        role === "farmer" &&
+        (!farmName || !location)
+      ) {
+
+        alert(
+          "Farm Name and Location are required."
+        );
+
+        return;
+      }
+
+      if (
+        role === "customer" &&
+        !address
+      ) {
+
+        alert(
+          "Address is required."
+        );
+
+        return;
+      }
+
       const userData = {
 
-        name:
-          document.getElementById(
-            "regName"
-          ).value,
-
-        email:
-          document.getElementById(
-            "regEmail"
-          ).value,
-
-        password:
-          document.getElementById(
-            "regPass"
-          ).value,
-
+        name,
+        email,
+        password,
         role,
-
-        farmName:
-          role === "farmer"
-            ? document.getElementById(
-                "farmName"
-              ).value
-            : "",
-
-        location:
-          role === "farmer"
-            ? document.getElementById(
-                "location"
-              ).value
-            : "",
-
-        address:
-          role === "customer"
-            ? document.getElementById(
-                "address"
-              ).value
-            : ""
+        farmName,
+        location,
+        address
       };
 
       try {
 
         const response =
           await fetch(
-            "http://localhost:5000/api/auth/register",
+            `${API_URL}/register`,
             {
-
               method: "POST",
 
               headers: {
@@ -285,10 +334,24 @@
 
         if (!response.ok) {
 
-          alert(
-            data.message ||
-            "Registration failed"
-          );
+          if (
+            data.errors &&
+            Array.isArray(
+              data.errors
+            )
+          ) {
+
+            alert(
+              data.errors.join("\n")
+            );
+
+          } else {
+
+            alert(
+              data.message ||
+              "Registration failed"
+            );
+          }
 
           return;
         }
