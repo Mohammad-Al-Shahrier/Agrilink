@@ -1,52 +1,84 @@
-const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+/* =====================================================
+   app.js — AgriLink
+   Responsibilities:
+     1. Navbar state (guest / logged-in / farmer)
+     2. Farmer panel visibility
+     3. Live search — delegates to product.js filterAndRender()
+     4. Logout
+     5. goHome() helper
+   NOTE: Product loading & rendering lives in product.js
+===================================================== */
 
-// ✅ FIXED HOME REDIRECT (works from any page)
+const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+
+/* =====================================================
+   HOME REDIRECT — works from any depth
+===================================================== */
 function goHome() {
-  window.location.href = window.location.pathname.includes("pages")
-    ? "../index.html"
-    : "index.html";
+  const inPages = window.location.pathname.includes("/pages/");
+  window.location.href = inPages ? "../index.html" : "index.html";
 }
 
-// NAVBAR UPDATE
-const guestLinks = document.getElementById("guestLinks");
-const userLinks = document.getElementById("userLinks");
-
-if (currentUser) {
-  guestLinks?.classList.add("hidden");
-  userLinks?.classList.remove("hidden");
-}
-
-// LOGOUT
+/* =====================================================
+   LOGOUT
+===================================================== */
 function logout() {
   localStorage.removeItem("currentUser");
+  localStorage.removeItem("token");
   goHome();
 }
 
-// FARMER PANEL
-const panel = document.getElementById("farmerPanel");
-if (currentUser?.role === "farmer" && panel) {
-  panel.classList.remove("hidden");
+/* =====================================================
+   NAVBAR STATE
+===================================================== */
+function updateNavbar() {
+  const guestLinks = document.getElementById("guestLinks");
+  const userLinks  = document.getElementById("userLinks");
+  if (!guestLinks || !userLinks) return;
+
+  if (currentUser) {
+    guestLinks.classList.add("hidden");
+    userLinks.classList.remove("hidden");
+  } else {
+    guestLinks.classList.remove("hidden");
+    userLinks.classList.add("hidden");
+  }
 }
 
-// SEARCH
-const search = document.getElementById("search");
+/* =====================================================
+   FARMER PANEL
+===================================================== */
+function updateFarmerPanel() {
+  const panel = document.getElementById("farmerPanel");
+  if (!panel) return;
+  if (currentUser?.role === "farmer") {
+    panel.classList.remove("hidden");
+  }
+}
 
-if (search) {
-  search.addEventListener("input", e => {
-    const value = e.target.value.toLowerCase();
+/* =====================================================
+   LIVE SEARCH — debounced 300 ms
+   Calls filterAndRender() defined in product.js
+===================================================== */
+function initSearch() {
+  const searchInput = document.getElementById("search");
+  if (!searchInput) return;
 
-    const products = JSON.parse(localStorage.getItem("products")) || [];
-
-    const filtered = products.filter(p =>
-      p.pname.toLowerCase().includes(value)
-    );
-
-    renderProducts(filtered);
+  let debounce;
+  searchInput.addEventListener("input", () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => {
+      /* filterAndRender is defined in product.js */
+      if (typeof filterAndRender === "function") {
+        filterAndRender(searchInput.value.trim());
+      }
+    }, 300);
   });
 }
 
-// OPTIONAL: hide dashboard for customer
-const dashboardLink = document.getElementById("dashboardLink");
-if (currentUser?.role !== "farmer" && dashboardLink) {
-  dashboardLink.style.display = "none";
-}
+/* =====================================================
+   INIT
+===================================================== */
+updateNavbar();
+updateFarmerPanel();
+initSearch();
