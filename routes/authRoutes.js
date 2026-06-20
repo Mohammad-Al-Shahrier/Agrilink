@@ -1,9 +1,31 @@
 import express from "express";
 
 import {
-  registerUser,
-  loginUser
-} from "../controllers/authController.js";
+registerUser,
+loginUser
+}
+from "../controllers/authController.js";
+
+import validate from "../middleware/zodValidator.js";
+
+import {
+  registerSchema,
+  loginSchema
+} from "../validators/authSchema.js";
+
+import validate from "../middleware/zodValidator.js";
+
+import {
+  registerSchema,
+  loginSchema
+} from "../validators/authSchema.js";
+
+import validate from "../middleware/zodValidator.js";
+
+import {
+  registerSchema,
+  loginSchema
+} from "../validators/authSchema.js";
 
 import validate from "../middleware/zodValidator.js";
 
