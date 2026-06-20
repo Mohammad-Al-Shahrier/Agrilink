@@ -19,6 +19,12 @@ const productSchema = new mongoose.Schema(
       min: 0
     },
 
+    unit: {
+      type: String,
+      enum: ["kg", "piece"],
+      default: "kg"
+    },
+
     stock: {
       type: Number,
       default: 1
@@ -51,9 +57,6 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-const Product = mongoose.model(
-  "Product",
-  productSchema
-);
+const Product = mongoose.model("Product", productSchema);
 
 export default Product;
