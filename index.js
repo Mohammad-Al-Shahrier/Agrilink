@@ -8,9 +8,9 @@ import path from "path";
 // Routes
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+import userRoutes from "./routes/profileRoutes.js";
 // import cartRoutes from "./routes/cartRoutes.js";
 // import orderRoutes from "./routes/orderRoutes.js";
-//import userRoutes from "./routes/userRoutes.js";
 
 // Load Environment Variables
 dotenv.config();
@@ -31,8 +31,8 @@ app.use(
   })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 app.use(cookieParser());
 
 // Uploads Folder
@@ -73,15 +73,11 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/products", productRoutes);
 
+app.use("/api/users", userRoutes);
+
 // app.use("/api/cart", cartRoutes);
 
 // app.use("/api/orders", orderRoutes);
-
-// app.use("/api/users", userRoutes);
-
-// =====================================
-// 404 Route Handler
-// =====================================
 
 // =====================================
 // 404 Route Handler
