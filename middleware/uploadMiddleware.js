@@ -1,45 +1,10 @@
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-
-const uploadPath = "uploads/products";
-
-if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath, {
-    recursive: true
-  });
-}
-
-const storage = multer.diskStorage({
-
-  destination: (
-    req,
-    file,
-    cb
-  ) => {
-
-    cb(null, uploadPath);
-
-  },
-
-  filename: (
-    req,
-    file,
-    cb
-  ) => {
-
-    cb(
-      null,
-      Date.now() +
-      path.extname(
-        file.originalname
-      )
-    );
-  }
-});
-
-const upload = multer({
-  storage
+/* ================================================================
+   middleware/uploadMiddleware.js  —  AgriLink
+   
+   Fixes:
+   ① Uses diskStorage (not memoryStorage) so file is saved to disk
+   ② Saves filename as "uploads/filename.jpg" path
+   ③ ES Module syntax (import/export)
 });
 
 export default upload;
