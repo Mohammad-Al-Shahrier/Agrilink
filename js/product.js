@@ -11,69 +11,6 @@
    Image URL pattern:
      MongoDB stores:  "uploads/1234_potato.jpg"
      URL becomes:     "http://localhost:5000/uploads/1234_potato.jpg"
-================================================================ */
-
-const API_BASE = "http://localhost:5000";
-
-/* All loaded products — cached for client-side filter */
-let _allProducts = [];
-
-/* ================================================================
-   IMAGE URL BUILDER
-   Handles every path format multer might store
-================================================================ */
-function buildProductImageUrl(path) {
-  if (!path) return "images/placeholder.jpg";
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  const clean = path.replace(/^\/+/, "");
-  if (clean.startsWith("uploads/")) return `${API_BASE}/${clean}`;
-  return `${API_BASE}/uploads/${clean}`;
-}
-
-/* ================================================================
-   LOAD PRODUCTS FROM API
-================================================================ */
-async function loadProducts() {
-  showSkeleton();
-
-  try {
-    const res = await fetch(`${API_BASE}/api/products`);
-    if (!res.ok) throw new Error(`Server error: ${res.status}`);
-    const data = await res.json();
-    _allProducts = data.products || (Array.isArray(data) ? data : []);
-    renderProducts(_allProducts);
-  } catch (err) {
-    console.error("[AgriLink] Failed to load products:", err);
-    _allProducts = [];
-    renderProducts([]);
-  }
-}
-
-/* ================================================================
-   SKELETON LOADER — shown while fetching
-================================================================ */
-function showSkeleton() {
-  const container = document.getElementById("productList");
-  if (!container) return;
-
-  container.innerHTML = `
-    <div class="skeleton-grid">
-      ${Array(4).fill(`
-        <div class="skel-card">
-          <div class="skel skel-img"></div>
-          <div class="skel-body">
-            <div class="skel skel-tag"></div>
-            <div class="skel skel-line"></div>
-            <div class="skel skel-line short"></div>
-            <div class="skel skel-btn"></div>
-          </div>
-        </div>`).join("")}
-    </div>`;
-}
-
-/* ================================================================
-   RENDER PRODUCT CARDS
-================================================================ */
 function renderProducts(products = []) {
   const container = document.getElementById("productList");
   if (!container) return;
@@ -131,8 +68,10 @@ function renderProducts(products = []) {
           ${imgPill}
         </div>
 
-        <!-- BODY -->
         <div class="card-body">
+          <span class="category-tag">${category}</span>
+          <h3 class="card-name">${name}</h3>
+          <p class="price">৳${price}<span> / ${unit}</span></p>
 
           <!-- Category + Stock side by side -->
           <div class="card-meta">
@@ -169,35 +108,6 @@ function renderProducts(products = []) {
    FILTER AND RENDER — called by search input + category chips
    This function MUST be defined here so app.js and index.html
    can call:  filterAndRender(searchQuery, category)
-================================================================ */
-function filterAndRender(query = "", category = "All") {
-  const q = query.toLowerCase().trim();
-
-  const filtered = _allProducts.filter(p => {
-    const name     = (p.pname || p.name || "").toLowerCase();
-    const cat      = p.category || "Vegetable";
-    const matchQ   = !q || name.includes(q);
-    const matchCat = category === "All" || cat === category;
-    return matchQ && matchCat;
-  });
-
-  renderProducts(filtered);
-}
-
-/* ================================================================
-   NAVIGATE TO PRODUCT DETAILS PAGE
-   Works from root (index.html) and from pages/ subfolder
-================================================================ */
-function goToDetails(productId) {
-  if (!productId) return;
-  const inPages = window.location.pathname.includes("/pages/");
-  const base    = inPages ? "product-details.html" : "pages/product-details.html";
-  window.location.href = `${base}?id=${productId}`;
-}
-
-/* ================================================================
-   QUICK ADD TO CART — from homepage card without page change
-================================================================ */
 async function quickAddToCart(productId, productName, btn) {
   const token       = localStorage.getItem("token");
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
@@ -248,5 +158,3 @@ async function quickAddToCart(productId, productName, btn) {
 
 /* ================================================================
    AUTO-LOAD when DOM is ready
-================================================================ */
-document.addEventListener("DOMContentLoaded", loadProducts);
