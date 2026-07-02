@@ -1,238 +1,252 @@
-// ===============================
-// GET PRODUCTS
-// ===============================
+/* ================================================================
+   js/product.js  —  AgriLink
+   
+   Handles:
+   ① Load all products from API
+   ② Render beautiful product cards with skeleton loading
+   ③ filterAndRender() — search + category (called by app.js & index.html)
+   ④ goToDetails() — navigate to product-details page
+   ⑤ quickAddToCart() — add to cart from homepage card
+   
+   Image URL pattern:
+     MongoDB stores:  "uploads/1234_potato.jpg"
+     URL becomes:     "http://localhost:5000/uploads/1234_potato.jpg"
+================================================================ */
 
-function getProducts() {
+const API_BASE = "http://localhost:5000";
 
-  return JSON.parse(
-    localStorage.getItem("products")
-  ) || [];
+/* All loaded products — cached for client-side filter */
+let _allProducts = [];
+
+/* ================================================================
+   IMAGE URL BUILDER
+   Handles every path format multer might store
+================================================================ */
+function buildProductImageUrl(path) {
+  if (!path) return "images/placeholder.jpg";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  const clean = path.replace(/^\/+/, "");
+  if (clean.startsWith("uploads/")) return `${API_BASE}/${clean}`;
+  return `${API_BASE}/uploads/${clean}`;
 }
 
-// ===============================
-// RENDER PRODUCTS
-// ===============================
+/* ================================================================
+   LOAD PRODUCTS FROM API
+================================================================ */
+async function loadProducts() {
+  showSkeleton();
 
-function renderProducts(list = null) {
+  try {
+    const res = await fetch(`${API_BASE}/api/products`);
+    if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    const data = await res.json();
+    _allProducts = data.products || (Array.isArray(data) ? data : []);
+    renderProducts(_allProducts);
+  } catch (err) {
+    console.error("[AgriLink] Failed to load products:", err);
+    _allProducts = [];
+    renderProducts([]);
+  }
+}
 
-  const container =
-    document.getElementById("productList");
-
+/* ================================================================
+   SKELETON LOADER — shown while fetching
+================================================================ */
+function showSkeleton() {
+  const container = document.getElementById("productList");
   if (!container) return;
 
-  const products =
-    list || getProducts();
+  container.innerHTML = `
+    <div class="skeleton-grid">
+      ${Array(4).fill(`
+        <div class="skel-card">
+          <div class="skel skel-img"></div>
+          <div class="skel-body">
+            <div class="skel skel-tag"></div>
+            <div class="skel skel-line"></div>
+            <div class="skel skel-line short"></div>
+            <div class="skel skel-btn"></div>
+          </div>
+        </div>`).join("")}
+    </div>`;
+}
 
-  container.innerHTML = "";
+/* ================================================================
+   RENDER PRODUCT CARDS
+================================================================ */
+function renderProducts(products = []) {
+  const container = document.getElementById("productList");
+  if (!container) return;
 
-  // EMPTY PRODUCTS
-  if (products.length === 0) {
-
+  if (!products.length) {
     container.innerHTML = `
-
       <div class="empty-products">
-
-        <h2>
-          No Products Available 😔
-        </h2>
-
-      </div>
-    `;
-
+        <div class="empty-icon">🌿</div>
+        <h2>No products found</h2>
+        <p>Try a different search or category.</p>
+        <a href="index.html" class="empty-btn">← Back to Home</a>
+      </div>`;
     return;
   }
 
-  // LOOP PRODUCTS
-  products.forEach((product, index) => {
+  container.innerHTML = products.map(p => {
+    const id       = p._id || p.id || "";
+    const name     = p.pname || p.name || "Unnamed";
+    const price    = Number(p.price || 0).toLocaleString("en-BD");
+    const category = p.category || "Vegetable";
+    const stock    = Number(p.stock ?? p.quantity ?? 0);
+    const unit     = p.unit === "piece" ? "piece" : "kg";
+    const imageUrl = buildProductImageUrl(p.image);
 
-    container.innerHTML += `
+    /* Stock pill on image */
+    let imgPill = "";
+    if      (stock <= 0) imgPill = `<span class="stock-pill out">Out of stock</span>`;
+    else if (stock <= 5) imgPill = `<span class="stock-pill low">⚡ Only ${stock} ${unit} left</span>`;
+    /* No pill if plenty in stock — keeps image clean */
 
-      <div class="card">
+    /* Inline stock label in card body */
+    let stockLabel = "";
+    if      (stock <= 0) stockLabel = `<span class="card-stock out">Out of stock</span>`;
+    else if (stock <= 5) stockLabel = `<span class="card-stock low">${stock} ${unit} left</span>`;
+    else                 stockLabel = `<span class="card-stock in">✓ In stock</span>`;
 
+    return `
+      <div
+        class="card"
+        data-category="${category}"
+        onclick="goToDetails('${id}')"
+        role="button"
+        tabindex="0"
+        aria-label="View details for ${name}"
+        onkeydown="if(event.key==='Enter') goToDetails('${id}')"
+      >
         <!-- IMAGE -->
-        <img
-          src="${product.image}"
-          alt="${product.pname}"
-        >
+        <div class="card-img-wrap">
+          <img
+            src="${imageUrl}"
+            alt="${name}"
+            loading="lazy"
+            onerror="this.src='images/placeholder.jpg'; this.onerror=null;"
+          >
+          ${imgPill}
+        </div>
 
         <!-- BODY -->
         <div class="card-body">
 
-          <h3>
-            ${product.pname}
-          </h3>
+          <!-- Category + Stock side by side -->
+          <div class="card-meta">
+            <span class="category-tag">${category}</span>
+            ${stockLabel}
+          </div>
+
+          <h3 class="card-name">${name}</h3>
 
           <p class="price">
-            ৳ ${product.price}
+            ৳${price}<span class="price-unit"> / ${unit}</span>
           </p>
 
-          <!-- BUTTONS -->
           <div class="product-buttons">
-
             <button
               class="view-btn"
-              onclick="viewProduct(${index})"
-            >
-              👁 View
-            </button>
+              onclick="event.stopPropagation(); goToDetails('${id}')"
+              aria-label="View details for ${name}"
+            >👁 Details</button>
 
             <button
               class="cart-btn"
-              onclick="addToCart(${index})"
-            >
-              🛒 Cart
-            </button>
-
+              onclick="event.stopPropagation(); quickAddToCart('${id}', '${name.replace(/'/g, "\\'")}', this)"
+              ${stock === 0 ? "disabled" : ""}
+              aria-label="Add ${name} to cart"
+            >🛒 Add to Cart</button>
           </div>
-
         </div>
+      </div>`;
+  }).join("");
+}
 
-      </div>
-    `;
+/* ================================================================
+   FILTER AND RENDER — called by search input + category chips
+   This function MUST be defined here so app.js and index.html
+   can call:  filterAndRender(searchQuery, category)
+================================================================ */
+function filterAndRender(query = "", category = "All") {
+  const q = query.toLowerCase().trim();
+
+  const filtered = _allProducts.filter(p => {
+    const name     = (p.pname || p.name || "").toLowerCase();
+    const cat      = p.category || "Vegetable";
+    const matchQ   = !q || name.includes(q);
+    const matchCat = category === "All" || cat === category;
+    return matchQ && matchCat;
   });
+
+  renderProducts(filtered);
 }
 
-// ===============================
-// VIEW PRODUCT
-// ===============================
-
-function viewProduct(index) {
-
-  const products = getProducts();
-
-  const product = products[index];
-
-  localStorage.setItem(
-    "selectedProduct",
-    JSON.stringify(product)
-  );
-
-  location.href =
-    "pages/product-details.html";
+/* ================================================================
+   NAVIGATE TO PRODUCT DETAILS PAGE
+   Works from root (index.html) and from pages/ subfolder
+================================================================ */
+function goToDetails(productId) {
+  if (!productId) return;
+  const inPages = window.location.pathname.includes("/pages/");
+  const base    = inPages ? "product-details.html" : "pages/product-details.html";
+  window.location.href = `${base}?id=${productId}`;
 }
 
-// ===============================
-// ADD TO CART
-// ===============================
+/* ================================================================
+   QUICK ADD TO CART — from homepage card without page change
+================================================================ */
+async function quickAddToCart(productId, productName, btn) {
+  const token       = localStorage.getItem("token");
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "null");
 
-function addToCart(index) {
-
-  // USER
-  const currentUser =
-    JSON.parse(
-      localStorage.getItem("currentUser")
-    );
-
-  // LOGIN CHECK
-  if (!currentUser) {
-
-    alert("Please login first!");
-
-    location.href =
-      "pages/login.html";
-
+  if (!currentUser || !token) {
+    alert("Please sign in to add items to your cart.");
+    window.location.href = "pages/login.html";
     return;
   }
 
-  // PRODUCTS
-  const products = getProducts();
+  const orig    = btn.innerHTML;
+  btn.disabled  = true;
+  btn.innerHTML = "Adding…";
 
-  const product = products[index];
-
-  // CART
-  let cart =
-    JSON.parse(
-      localStorage.getItem("cart")
-    ) || [];
-
-  // EXIST CHECK
-  const existingProduct =
-    cart.find(item =>
-
-      item.userEmail === currentUser.email &&
-
-      item.pname === product.pname
-    );
-
-  // IF EXISTS
-  if (existingProduct) {
-
-    existingProduct.qty += 1;
-
-    existingProduct.total =
-      existingProduct.qty *
-      Number(existingProduct.price);
-
-  } else {
-
-    // NEW PRODUCT
-    cart.push({
-
-      id: Date.now(),
-
-      pname: product.pname,
-
-      price: Number(product.price),
-
-      image: product.image,
-
-      qty: 1,
-
-      total: Number(product.price),
-
-      userEmail: currentUser.email
+  try {
+    const res = await fetch(`${API_BASE}/api/cart`, {
+      method:  "POST",
+      headers: {
+        "Content-Type":  "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ productId, quantity: 1 })
     });
-  }
 
-  // SAVE
-  localStorage.setItem(
-    "cart",
-    JSON.stringify(cart)
-  );
-
-  alert("🛒 Product added to cart!");
-}
-
-// ===============================
-// SEARCH
-// ===============================
-
-const searchInput =
-  document.getElementById("search");
-
-if (searchInput) {
-
-  searchInput.addEventListener(
-    "input",
-    function () {
-
-      const value =
-        this.value.toLowerCase();
-
-      const products =
-        getProducts();
-
-      const filteredProducts =
-        products.filter(product =>
-
-          product.pname
-            .toLowerCase()
-            .includes(value)
-        );
-
-      renderProducts(filteredProducts);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || "Failed to add to cart");
     }
-  );
+
+    btn.innerHTML = "✅ Added!";
+    btn.style.background = "#1a4d2e";
+
+    setTimeout(() => {
+      btn.innerHTML        = orig;
+      btn.style.background = "";
+      btn.disabled         = false;
+    }, 2000);
+
+  } catch (err) {
+    console.error("[AgriLink] Cart error:", err);
+    btn.innerHTML = "❌ Error";
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      btn.disabled  = false;
+    }, 2000);
+  }
 }
 
-// ===============================
-// INITIAL LOAD
-// ===============================
-
-document.addEventListener(
-  "DOMContentLoaded",
-  function () {
-
-    renderProducts();
-  }
-);
+/* ================================================================
+   AUTO-LOAD when DOM is ready
+================================================================ */
+document.addEventListener("DOMContentLoaded", loadProducts);
