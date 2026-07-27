@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details | AgriLink</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+  /* ================================================================
+     PRODUCT DETAILS — Inline styles
+     All styles are self-contained so no missing CSS file can break this page.
+  ================================================================ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --forest:      #0d2818;
+    --green-deep:  #1a4d2e;
+    --green-main:  #2e7d32;
+    --green-light: #eaf3de;
+    --lime:        #76ff03;
+    --lime-dark:   #57cc00;
+    --bg:          #f7f9f4;
+    --white:       #ffffff;
+    --muted:       #eef2ea;
+    --text-1:      #111b14;
+    --text-2:      #4a5c4d;
+    --text-3:      #7a8f7d;
+    --border:      rgba(0,0,0,0.08);
+    --shadow-sm:   0 2px 8px rgba(0,0,0,0.06);
+    --shadow-md:   0 6px 24px rgba(0,0,0,0.10);
+    --shadow-lg:   0 16px 48px rgba(0,0,0,0.14);
+    --radius:      16px;
+    --ease:        cubic-bezier(0.22,1,0.36,1);
+  }
+
+  body {
+    font-family: 'Poppins', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text-1);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { text-decoration: none; color: inherit; }
+  button { font-family: inherit; cursor: pointer; border: none; outline: none; }
+  img { max-width: 100%; display: block; }
+
+  /* ── HIDDEN ── */
+  .hidden { display: none !important; }
+
+  /* ================================================================
+     NAVBAR (inherits from style.css but adds fallback)
+  ================================================================ */
+  .navbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--forest);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 68px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+  }
+  .logo { color: #fff; font-size: 22px; font-weight: 800; cursor: pointer; letter-spacing: -0.3px; }
+  .nav-links { display: flex; align-items: center; gap: 4px; }
+  .nav-links a {
+    color: rgba(255,255,255,0.72); font-size: 13px; font-weight: 500;
+    padding: 7px 12px; border-radius: 8px; transition: all .2s;
+  }
+  .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+  .nav-links .btn-nav {
+    background: var(--lime); color: var(--forest);
+    font-weight: 700; border-radius: 100px; padding: 8px 18px;
+  }
+  .nav-links .btn-nav:hover { background: var(--lime-dark); }
+
+  /* ================================================================
+     BREADCRUMB
+  ================================================================ */
+  .breadcrumb-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 11px 48px;
+  }
+  .breadcrumb {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--text-3);
+    max-width: 1160px; margin: 0 auto;
+  }
+  .breadcrumb a { color: var(--text-3); transition: color .2s; }
+  .breadcrumb a:hover { color: var(--green-main); }
+  .breadcrumb .sep { opacity: .5; }
+  .breadcrumb .current { color: var(--text-1); font-weight: 500; }
+
+  /* ================================================================
+     MAIN WRAPPER
+  ================================================================ */
+  .pd-wrap {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+    min-height: 70vh;
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    color: var(--green-main); font-size: 13px; font-weight: 600;
+    margin-bottom: 24px;
+    transition: gap .2s, color .2s;
+  }
+  .back-link:hover { gap: 9px; color: var(--green-deep); }
+
+  /* ================================================================
+     LOADING STATE
+  ================================================================ */
+  .pd-loading {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 55vh; gap: 14px;
+    color: var(--text-3); font-size: 14px;
+  }
+  .pd-spinner {
+    width: 42px; height: 42px;
+    border: 3px solid var(--muted);
+    border-top-color: var(--green-main);
+    border-radius: 50%;
+    animation: spin .75s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ================================================================
+     ERROR STATE
+  ================================================================ */
+  .pd-error {
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+    min-height: 55vh; justify-content: center;
+    gap: 10px;
+  }
+  .pd-error .err-icon { font-size: 52px; }
+  .pd-error h2 { font-size: 22px; font-weight: 700; color: var(--text-1); }
+  .pd-error p  { font-size: 14px; color: var(--text-3); max-width: 380px; }
+  .pd-error .back-home {
+    display: inline-block; margin-top: 12px;
+    padding: 12px 28px; background: var(--green-deep); color: #fff;
+    border-radius: 100px; font-size: 14px; font-weight: 600;
+    transition: background .2s, transform .2s var(--ease);
+  }
+  .pd-error .back-home:hover { background: var(--forest); transform: translateY(-2px); }
+
+  /* ================================================================
+     PRODUCT CARD LAYOUT
+  ================================================================ */
+  .pd-card {
+    display: grid;
+    grid-template-columns: 480px 1fr;
+    gap: 52px;
+    align-items: start;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 40px;
+    box-shadow: var(--shadow-md);
+    animation: fadeUp .35s var(--ease);
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ================================================================
+     IMAGE COLUMN
+  ================================================================ */
+  .pd-image-col {
+    position: sticky;
+    top: 88px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .pd-img-main {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--muted);
+  }
+
+  .pd-img-main img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    transition: transform .5s var(--ease);
+  }
+  .pd-img-main:hover img { transform: scale(1.04); }
+
+  /* Stock badge on image */
+  .img-stock-badge {
+    position: absolute; top: 14px; left: 14px;
+    padding: 5px 14px; border-radius: 100px;
+    font-size: 12px; font-weight: 700; letter-spacing: .3px;
+    backdrop-filter: blur(6px);
+  }
+  .badge-green  { background: rgba(46,125,50,0.92); color: #fff; }
+  .badge-orange { background: rgba(230,81,0,0.92);  color: #fff; }
+  .badge-red    { background: rgba(198,40,40,0.92);  color: #fff; }
+
+  /* Farmer card below image */
+  .farmer-strip {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--green-light);
+    border-radius: 12px;
+    padding: 14px 18px;
+    border: 1px solid rgba(46,125,50,0.15);
+  }
+  .farmer-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--green-main);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .farmer-info { flex: 1; min-width: 0; }
+  .farmer-label { font-size: 10px; color: var(--green-main); font-weight: 600; text-transform: uppercase; letter-spacing: .6px; display: block; }
+  .farmer-name  { font-size: 14px; font-weight: 700; color: var(--text-1); display: block; }
+  .farmer-sub   { font-size: 12px; color: var(--green-main); font-weight: 500; }
+  .farmer-verified { margin-left: auto; font-size: 20px; }
+
+  /* Share row */
+  .share-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .share-label { font-size: 12px; color: var(--text-3); font-weight: 500; }
+  .share-btn {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; cursor: pointer; transition: background .2s;
+  }
+  .share-btn:hover { background: var(--muted); }
+
+  /* ================================================================
+     INFO COLUMN
+  ================================================================ */
+  .pd-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-top: 4px;
+  }
+
+  /* Category tag */
+  .cat-tag {
+    display: inline-block;
+    background: rgba(46,125,50,0.09);
+    color: var(--green-main);
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1.2px;
+    padding: 4px 12px; border-radius: 100px;
+    margin-bottom: 12px; width: fit-content;
+  }
+
+  /* Title */
+  .pd-title {
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 800;
+    color: var(--text-1);
+    letter-spacing: -0.5px;
+    line-height: 1.18;
+    margin-bottom: 12px;
+  }
+
+  /* Rating row */
+  .rating-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 16px;
+  }
+  .stars { display: flex; gap: 2px; color: #f59e0b; font-size: 15px; }
+  .rating-val   { font-size: 14px; font-weight: 700; color: var(--text-1); }
+  .rating-count { font-size: 12px; color: var(--text-3); }
+
+  /* Price */
+  .price-row {
+    display: flex; align-items: baseline; gap: 8px;
+    margin-bottom: 6px;
+  }
+  .pd-price {
+    font-size: clamp(32px, 4vw, 44px);
+    font-weight: 900;
+    color: var(--green-deep);
+    letter-spacing: -1.5px;
+    line-height: 1;
+  }
+  .pd-unit { font-size: 15px; color: var(--text-3); font-weight: 500; }
+
+  .price-guarantee {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; color: #d97706;
+    background: #fef3c7; padding: 3px 10px;
+    border-radius: 100px; margin-bottom: 20px; width: fit-content;
+  }
+
+  /* Divider */
+  .pd-divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+
+  /* Description */
+  .pd-desc-label {
+    font-size: 11px; font-weight: 700; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: .8px;
+    margin-bottom: 8px;
+  }
+  .pd-desc {
+    font-size: 14px; color: var(--text-2); line-height: 1.8;
+    margin-bottom: 4px;
+  }
+
+  /* Highlights */
+  .highlights {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin: 16px 0;
+  }
+  .hl-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 500; color: var(--text-2);
+    background: var(--muted); padding: 10px 14px;
+    border-radius: 10px;
+  }
+  .hl-item .hl-icon { font-size: 16px; }
+
+  /* Meta grid */
+  .meta-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px 24px; margin-bottom: 4px;
+  }
+  .meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .meta-label {
+    font-size: 10px; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: .7px; font-weight: 600;
+  }
+  .meta-val {
+    font-size: 14px; color: var(--text-1); font-weight: 600;
+  }
+  .meta-val.in-stock  { color: var(--green-main); }
+  .meta-val.low-stock { color: #e67e22; }
+  .meta-val.no-stock  { color: #c0392b; }
+
+  /* Quantity picker */
+  .qty-section { margin: 6px 0; }
+  .qty-heading {
+    font-size: 12px; font-weight: 700; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: .5px;
+    margin-bottom: 10px;
+  }
+  .qty-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .qty-picker {
+    display: flex; align-items: center;
+    border: 1.5px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    background: var(--white);
+  }
+  .qty-btn {
+    width: 42px; height: 42px;
+    background: var(--muted); border: none;
+    font-size: 18px; font-weight: 700;
+    cursor: pointer; color: var(--text-1);
+    transition: background .15s;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .qty-btn:hover:not(:disabled) { background: #d0ddd0; }
+  .qty-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .qty-val {
+    min-width: 54px; text-align: center;
+    font-size: 16px; font-weight: 700; color: var(--text-1);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    line-height: 42px;
+  }
+  .qty-unit-label { font-size: 13px; color: var(--text-3); }
+
+  .total-line {
+    font-size: 13px; color: var(--text-2);
+    margin-top: 10px; margin-bottom: 18px;
+  }
+  .total-line strong { font-size: 18px; color: var(--green-main); font-weight: 800; margin-right: 4px; }
+  .total-note { font-size: 12px; color: var(--text-3); }
+
+  /* Action buttons */
+  .action-btns { display: flex; gap: 12px; }
+  .btn-cart, .btn-buy {
+    flex: 1; padding: 16px 20px;
+    border-radius: 12px; font-size: 15px; font-weight: 700;
+    letter-spacing: .2px; border: none;
+    transition: background .2s, transform .18s var(--ease), box-shadow .2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn-cart {
+    background: var(--muted); color: var(--green-deep);
+    border: 1.5px solid var(--green-main);
+  }
+  .btn-cart:hover:not(:disabled) {
+    background: var(--green-main); color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(46,125,50,.25);
+  }
+  .btn-cart.added { background: var(--green-deep); color: #fff; border-color: var(--green-deep); }
+  .btn-buy {
+    background: var(--green-main); color: #fff;
+    box-shadow: 0 4px 14px rgba(46,125,50,.28);
+  }
+  .btn-buy:hover:not(:disabled) {
+    background: var(--forest);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(13,40,24,.32);
+  }
+  .btn-cart:active:not(:disabled),
+  .btn-buy:active:not(:disabled)  { transform: translateY(0); }
+  .btn-cart:disabled,
+  .btn-buy:disabled {
+    background: #ccc; border-color: #ccc;
+    color: #fff; cursor: not-allowed; box-shadow: none;
+  }
+  .btn-icon { font-size: 18px; }
+
+  /* Inline toast */
+  .inline-toast {
+    margin-top: 12px; padding: 11px 16px;
+    border-radius: 10px; font-size: 13px; font-weight: 500;
+    text-align: center;
+  }
+  .toast-success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+  .toast-error   { background: #ffebee; color: #b71c1c; border: 1px solid #ffcdd2; }
+  .toast-warn    { background: #fff8e1; color: #795548; border: 1px solid #ffe082; }
+
+  /* ================================================================
+     RELATED PRODUCTS
+  ================================================================ */
+  .related-section {
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 56px 0 72px;
+    margin-top: 0;
+  }
+  .related-inner { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  .related-hdr {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px; flex-wrap: wrap; gap: 10px;
+  }
+  .related-hdr h2 { font-size: 24px; font-weight: 800; color: var(--text-1); letter-spacing: -.4px; }
+  .related-hdr a  { font-size: 13px; font-weight: 600; color: var(--green-main); }
+  .related-hdr a:hover { color: var(--green-deep); }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .rel-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden; cursor: pointer;
+    transition: transform .2s var(--ease), box-shadow .2s, border-color .2s;
+    box-shadow: var(--shadow-sm);
+  }
+  .rel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(46,125,50,0.2);
+  }
+  .rel-img-wrap { overflow: hidden; aspect-ratio: 4/3; }
+  .rel-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform .45s var(--ease);
+  }
+  .rel-card:hover .rel-img-wrap img { transform: scale(1.06); }
+  .rel-body { padding: 12px 14px 16px; }
+  .rel-cat  { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--green-main); display: block; margin-bottom: 4px; }
+  .rel-name { font-size: 14px; font-weight: 700; color: var(--text-1); line-height: 1.3; margin-bottom: 6px; }
+  .rel-price { font-size: 13px; font-weight: 700; color: var(--green-deep); }
+
+  /* ================================================================
+     FOOTER (fallback if style.css doesn't have it)
+  ================================================================ */
+  footer {
+    background: var(--forest); color: #fff;
+  }
+  .footer-container {
+    max-width: 1160px; margin: 0 auto;
+    display: grid; grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 48px; padding: 56px 24px 48px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-box h2 { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
+  .footer-box h3 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,0.45); margin-bottom: 16px; }
+  .footer-box p  { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.8; }
+  .footer-box a  { display: block; font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 10px; transition: color .2s; }
+  .footer-box a:hover { color: var(--lime); }
+  .footer-bottom { text-align: center; padding: 20px; font-size: 12px; color: rgba(255,255,255,0.3); }
+
+  /* ================================================================
+     RESPONSIVE
+  ================================================================ */
+  @media (max-width: 960px) {
+    .pd-card { grid-template-columns: 1fr; gap: 32px; padding: 28px; }
+    .pd-image-col { position: static; }
+    .pd-img-main img { aspect-ratio: 4/3; }
+    .navbar { padding: 0 20px; }
+    .breadcrumb-bar { padding: 10px 20px; }
+    .footer-container { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .pd-wrap { padding: 20px 16px 56px; }
+    .pd-title { font-size: 24px; }
+    .pd-price { font-size: 30px; }
+    .highlights { grid-template-columns: 1fr; }
+    .action-btns { flex-direction: column; }
+    .meta-grid { grid-template-columns: 1fr 1fr; }
+    .related-grid { grid-template-columns: 1fr 1fr; }
+    .footer-container { grid-template-columns: 1fr; gap: 32px; }
+    .nav-links a:not(.btn-nav) { display: none; }
+  }
+
+  @media (max-width: 380px) {
+    .related-grid { grid-template-columns: 1fr; }
+  }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <h2 class="logo" onclick="goHome()">🌱 AgriLink</h2>
+  <div class="nav-links">
+    <div id="guestLinks">
+      <a href="../index.html">Home</a>
+      <a href="login.html">Sign In</a>
+      <a href="register.html" class="btn-nav">Sign Up</a>
+    </div>
+    <div id="userLinks" class="hidden">
+      <a href="profile.html">👤 Profile</a>
+      <a href="dashboard.html" class="dashboard-link">📊 Dashboard</a>
+      <a href="cart.html" class="cart-link">🛒 Cart</a>
+      <a href="#" onclick="doLogout()">🚪 Logout</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== BREADCRUMB ===== -->
+<div class="breadcrumb-bar">
+  <div class="breadcrumb">
+    <a href="../index.html">Home</a>
+    <span class="sep">›</span>
+    <a href="../index.html#productSection">Products</a>
+    <span class="sep">›</span>
+    <span class="current" id="bcName">Loading…</span>
+  </div>
+</div>
+
+<!-- ===== PRODUCT DETAILS SECTION ===== -->
+<div class="pd-wrap">
+
+  <a href="../index.html" class="back-link">← Back to Products</a>
+
+  <!-- LOADING -->
+  <div class="pd-loading" id="pdLoading">
+    <div class="pd-spinner"></div>
+    <p>Loading product…</p>
+  </div>
+
+  <!-- ERROR -->
+  <div class="pd-error hidden" id="pdError">
+    <span class="err-icon">🌿</span>
+    <h2>Product not found</h2>
+    <p id="pdErrorMsg">This product may no longer be available.</p>
+    <a href="../index.html" class="back-home">← Back to products</a>
+  </div>
+
+  <!-- CONTENT (injected by JS) -->
+  <div id="pdContent"></div>
+
+</div>
+
+<!-- ===== RELATED PRODUCTS ===== -->
+<section class="related-section hidden" id="relatedSection">
+  <div class="related-inner">
+    <div class="related-hdr">
+      <h2>You might also like</h2>
+      <a href="../index.html#productSection">See all →</a>
+    </div>
+    <div class="related-grid" id="relatedGrid"></div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-container">
+    <div class="footer-box">
+      <h2>🌱 AgriLink</h2>
+      <p>Smart Agriculture platform connecting farmers and customers directly.</p>
+    </div>
+    <div class="footer-box">
+      <h3>Quick Links</h3>
+      <a href="../index.html">Home</a>
+      <a href="dashboard.html" class="dashboard-link">Dashboard</a>
+      <a href="cart.html">Cart</a>
+    </div>
+    <div class="footer-box">
+      <h3>Support</h3>
+      <a href="#">Help Center</a>
+      <a href="#">Terms & Conditions</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 AgriLink | Smart Agriculture 🌱</div>
+</footer>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="../js/config.js"></script>
+<script src="../js/storage.js"></script>
+<script src="../js/app.js"></script>
+
+<script>
+/* ================================================================
+   PRODUCT DETAILS — Self-contained inline script
+   No external product-details.js dependency.
+   
+   Flow:
+   1. Read ?id= from URL
+   2. Try GET /api/products/:id  (fast path)
+   3. If 404 → GET /api/products and scan list  (fallback)
+   4. Render full details
+   5. Load related products from same category
+================================================================ */
+
+const SRV = window.API_BASE || "http://localhost:5000";
+const API = `${SRV}/api`;
+
+/* ── Session ── */
+const ME    = JSON.parse(localStorage.getItem("currentUser") || "null");
+const TOKEN = localStorage.getItem("token");
+
+/* ── URL param ── */
+const PID = new URLSearchParams(window.location.search).get("id");
+
+/* ── State ── */
+let _product  = null;
+let _quantity = 1;
+
+/* ── DOM shortcuts ── */
+const $ = id => document.getElementById(id);
+
+/* ================================================================
+   NAVBAR
+================================================================ */
+(function initNav() {
+  const g = $("guestLinks");
+  const u = $("userLinks");
+  if (!g || !u) return;
+  if (ME) { g.classList.add("hidden");   u.classList.remove("hidden"); }
+  else    { g.classList.remove("hidden"); u.classList.add("hidden"); }
+})();
+
+function goHome()   { window.location.href = "../index.html"; }
+function doLogout() {
+  localStorage.removeItem("currentUser");
+  localStorage.removeItem("token");
+  window.location.href = "../index.html";
+}
+
+/* ================================================================
+   IMAGE URL — handles all multer storage patterns
+   
+   MongoDB might store:
+     "uploads/1234_potato.jpg"  →  http://localhost:5000/uploads/1234_potato.jpg  ✅
+     "1234_potato.jpg"          →  http://localhost:5000/uploads/1234_potato.jpg  ✅
+     "http://..."               →  used as-is                                      ✅
+================================================================ */
+function imgUrl(p) {
+  if (!p) return "../images/placeholder.jpg";
+  if (p.startsWith("http://") || p.startsWith("https://")) return p;
+  const clean = p.replace(/^\/+/, "");
+  if (clean.startsWith("uploads/")) return `${SRV}/${clean}`;
+  return `${SRV}/uploads/${clean}`;
+}
+
+/* Fallback on error — tries alternate path then gives up */
+function onImgError(el) {
+  if (el.dataset.tried) {
+    el.src = "../images/placeholder.jpg";
+    el.onerror = null;
+    return;
+  }
+  el.dataset.tried = "1";
+  const cur  = el.src;
+  if (cur.includes("/uploads/")) {
+    /* Try without /uploads/ */
+    el.src = cur.replace("/uploads/", "/");
+  } else {
+    /* Try with /uploads/ */
+    el.src = `${SRV}/uploads/${cur.split("/").pop()}`;
+  }
+}
+
+/* ================================================================
+   HELPERS
+================================================================ */
+const unitLabel  = u  => u === "piece" ? "piece" : "kg";
+const taka       = n  => `৳${Number(n || 0).toLocaleString("en-BD")}`;
+const formatDate = dt => dt
+  ? new Date(dt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+  : null;
+
+function stockInfo(stock, unit) {
+  const u = unitLabel(unit);
+  const s = Number(stock ?? 99);
+  if (s <= 0)  return { badge: `<span class="img-stock-badge badge-red">Out of Stock</span>`,       cls: "no-stock",  text: "Out of stock" };
+  if (s <= 5)  return { badge: `<span class="img-stock-badge badge-orange">Only ${s} ${u} left</span>`, cls: "low-stock", text: `Only ${s} ${u} left!` };
+  return { badge: `<span class="img-stock-badge badge-green">In Stock</span>`, cls: "in-stock", text: `In stock (${s} ${u})` };
+}
+
+/* ================================================================
+   LOAD PRODUCT — dual-strategy
+================================================================ */
+async function init() {
+  if (!PID) { showError("No product selected."); return; }
+
+  /* Strategy 1 — single product endpoint */
+  try {
+    const res = await fetch(`${API}/products/${PID}`);
+    console.log(`[PD] GET /api/products/${PID} →`, res.status);
+    if (res.ok) {
+      const data = await res.json();
+      const p    = data.product || data.data || (data._id ? data : null);
+      if (p && (p.pname || p.name)) { render(p); return; }
+    }
+  } catch (e) { console.warn("[PD] Single endpoint error:", e.message); }
+
+  /* Strategy 2 — scan all products */
+  try {
+    const res  = await fetch(`${API}/products`);
+    console.log("[PD] GET /api/products →", res.status);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const list = data.products || (Array.isArray(data) ? data : []);
+    const p    = list.find(x => String(x._id) === String(PID));
+    if (p) { render(p); return; }
+    showError(`Product not found. (${list.length} products in database)`);
+  } catch (e) {
+    console.error("[PD] List scan error:", e);
+    showError(e.message || "Could not connect to server. Is it running?");
+  }
+}
+
+/* ================================================================
+   RENDER — full product card
+================================================================ */
+function render(p) {
+  console.log("[PD] Rendering:", p);
+  _product  = p;
+  _quantity = 1;
+
+  const name    = p.pname || p.name || "Unnamed product";
+  const u       = unitLabel(p.unit);
+  const price   = Number(p.price || 0);
+  const stock   = Number(p.stock ?? p.quantity ?? 99);
+  const si      = stockInfo(stock, p.unit);
+  const inStock = stock > 0;
+  const viewerIsFarmer = JSON.parse(localStorage.getItem("currentUser") || "null")?.role === "farmer";
+  const canBuy = inStock && !viewerIsFarmer;
+  const addedOn = formatDate(p.createdAt);
+  const imgSrc  = imgUrl(p.image);
+
+  /* Page title + breadcrumb */
+  document.title               = `${name} | AgriLink`;
+  $("bcName").textContent      = name;
+
+  /* Farmer info */
+  const farmerName = p.farmer?.name     || "Local Farmer";
+  const farmerFarm = p.farmer?.farmName || "";
+  const farmerLoc  = p.farmer?.location || "Bangladesh";
+
+  $("pdContent").innerHTML = `
+    <div class="pd-card">
+
+      <!-- ── IMAGE ── -->
+      <div class="pd-image-col">
+        <div class="pd-img-main">
+          <img
+            id="pdImg"
+            src="${imgSrc}"
+            alt="${name}"
+            onerror="onImgError(this)"
+          >
+          ${si.badge}
+        </div>
+
+        <!-- Farmer strip -->
+        <div class="farmer-strip">
+          <div class="farmer-avatar">🌾</div>
+          <div class="farmer-info">
+            <span class="farmer-label">Sold by</span>
+            <span class="farmer-name">${farmerName}</span>
+            ${farmerFarm ? `<span class="farmer-sub">🏡 ${farmerFarm}${farmerLoc ? ` · ${farmerLoc}` : ""}</span>` : ""}
+          </div>
+          <span class="farmer-verified" title="Verified seller">✅</span>
+        </div>
+
+        <!-- Share row -->
+        <div class="share-row">
+          <span class="share-label">Share:</span>
+          <button class="share-btn" title="Copy link" onclick="copyLink()">🔗</button>
+          <button class="share-btn" title="Share on Facebook"
+            onclick="window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href))">📘</button>
+        </div>
+      </div>
+
+      <!-- ── INFO ── -->
+      <div class="pd-info">
+
+        <span class="cat-tag">${p.category || "Vegetable"}</span>
+
+        <h1 class="pd-title">${name}</h1>
+
+        <!-- Rating (static display — replace with real data if you add reviews) -->
+        <div class="rating-row">
+          <div class="stars">★★★★½</div>
+          <span class="rating-val">4.5</span>
+          <span class="rating-count">(128 reviews)</span>
+        </div>
+
+        <!-- Price -->
+        <div class="price-row">
+          <span class="pd-price">${taka(price)}</span>
+          <span class="pd-unit">/ ${u}</span>
+        </div>
+        <div class="price-guarantee">🏷️ Best price guaranteed</div>
+
+        <!-- Highlights -->
+        <div class="highlights">
+          <div class="hl-item"><span class="hl-icon">🌿</span> 100% Organic</div>
+          <div class="hl-item"><span class="hl-icon">🚚</span> Same-day delivery</div>
+          <div class="hl-item"><span class="hl-icon">🛡️</span> Quality assured</div>
+          <div class="hl-item"><span class="hl-icon">🔄</span> Easy returns</div>
+        </div>
+
+        <hr class="pd-divider">
+
+        <!-- Description -->
+        <div class="pd-desc-label">About this product</div>
+        <p class="pd-desc">${p.description || "Fresh and organic, directly from local farms with no chemicals or preservatives."}</p>
+
+        <hr class="pd-divider">
+
+        <!-- Meta grid -->
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Category</span>
+            <span class="meta-val">${p.category || "Vegetable"}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Unit</span>
+            <span class="meta-val">${u === "piece" ? "🔢 Piece" : "⚖️ kg"}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Availability</span>
+            <span class="meta-val ${si.cls}">${si.text}</span>
+          </div>
+          ${addedOn ? `<div class="meta-item">
+            <span class="meta-label">Listed on</span>
+            <span class="meta-val">${addedOn}</span>
+          </div>` : ""}
+        </div>
+
+        <hr class="pd-divider">
+
+        <!-- Quantity picker -->
+        <div class="qty-section">
+          <div class="qty-heading">Quantity</div>
+          <div class="qty-row">
+            <div class="qty-picker">
+              <button class="qty-btn" id="qMinus" onclick="changeQty(-1)" ${!inStock ? "disabled" : ""}>−</button>
+              <span class="qty-val" id="qVal">1</span>
+              <button class="qty-btn" id="qPlus"  onclick="changeQty(1)"  ${!inStock ? "disabled" : ""}>+</button>
+            </div>
+            <span class="qty-unit-label">${u}</span>
+          </div>
+
+          <div class="total-line">
+            Total: <strong id="totalAmt">${taka(price)}</strong>
+            <span class="total-note" id="totalNote">(1 ${u} × ${taka(price)})</span>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="action-btns">
+          <button
+            id="btnCart"
+            class="btn-cart"
+            onclick="addToCart()"
+            ${!canBuy ? "disabled" : ""}
+            ${viewerIsFarmer ? 'title="Farmer accounts can\'t purchase products"' : ""}
+          >
+            <span class="btn-icon">🛒</span>
+            ${viewerIsFarmer ? "Farmers can't buy" : inStock ? "Add to Cart" : "Out of Stock"}
+          </button>
+          <button
+            id="btnBuy"
+            class="btn-buy"
+            onclick="buyNow()"
+            ${!canBuy ? "disabled" : ""}
+            ${viewerIsFarmer ? 'title="Farmer accounts can\'t purchase products"' : ""}
+          >
+            <span class="btn-icon">⚡</span>
+            ${viewerIsFarmer ? "Unavailable" : inStock ? "Buy Now" : "Unavailable"}
+          </button>
+        </div>
+
+        <!-- Inline toast -->
+        <div class="inline-toast hidden" id="pdToast"></div>
+
+      </div>
+    </div>`;
+
+  /* Store qty max for picker */
+  $("qPlus").dataset.max = stock;
+
+  /* Show content, hide loader */
+  $("pdLoading").classList.add("hidden");
+  $("pdError").classList.add("hidden");
+
+  /* Load related */
+  loadRelated(p.category);
+}
+
+/* ================================================================
+   QUANTITY PICKER
+================================================================ */
+function changeQty(delta) {
+  if (!_product) return;
+  const max = Number($("qPlus").dataset.max || 99);
+  const nxt = _quantity + delta;
+  if (nxt < 1 || nxt > max) return;
+  _quantity = nxt;
+
+  $("qVal").textContent  = _quantity;
+  $("qMinus").disabled   = _quantity <= 1;
+  $("qPlus").disabled    = _quantity >= max;
+
+  const price = Number(_product.price || 0);
+  const u     = unitLabel(_product.unit);
+  $("totalAmt").textContent  = taka(price * _quantity);
+  $("totalNote").textContent = `(${_quantity} ${u} × ${taka(price)})`;
+}
+
+/* ================================================================
+   CART API POST
+================================================================ */
+async function cartPost(pid, qty) {
+  const res = await fetch(`${API}/cart`, {
+    method: "POST",
+    headers: {
+      "Content-Type":  "application/json",
+      "Authorization": `Bearer ${TOKEN}`
+    },
+    body: JSON.stringify({ productId: pid, quantity: qty })
+  });
+  const d = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(d.message || "Cart error");
+  return d;
+}
+
+function needLogin() {
+  if (!TOKEN) {
+    alert("Please sign in first.");
+    window.location.href = "login.html";
+    return false;
+  }
+  const user = JSON.parse(localStorage.getItem("currentUser") || "null");
+  if (user?.role === "farmer") {
+    alert("Farmer accounts can't purchase products. Please use a customer account to shop.");
+    return false;
+  }
+  return true;
+}
+
+/* ================================================================
+   ADD TO CART
+================================================================ */
+async function addToCart() {
+  if (!needLogin() || !_product) return;
+
+  const btn  = $("btnCart");
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = "<span class='btn-icon'>⏳</span> Adding…";
+
+  try {
+    await cartPost(_product._id, _quantity);
+    btn.classList.add("added");
+    btn.innerHTML = "<span class='btn-icon'>✅</span> Added to cart!";
+    showToast(`✅ ${_quantity} ${unitLabel(_product.unit)} added to cart!`, "success");
+    setTimeout(() => {
+      btn.classList.remove("added");
+      btn.innerHTML = orig;
+      btn.disabled  = false;
+    }, 2000);
+  } catch (e) {
+    console.error("[PD] Cart error:", e);
+    showToast(`❌ ${e.message}`, "error");
+    btn.innerHTML = orig;
+    btn.disabled  = false;
+  }
+}
+
+/* ================================================================
+   BUY NOW
+================================================================ */
+async function buyNow() {
+  if (!needLogin() || !_product) return;
+
+  const btn  = $("btnBuy");
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = "<span class='btn-icon'>⏳</span> Processing…";
+
+  try {
+    await cartPost(_product._id, _quantity);
+    window.location.href = "cart.html";
+  } catch (e) {
+    console.error("[PD] Buy Now error:", e);
+    showToast(`❌ ${e.message}`, "error");
+    btn.innerHTML = orig;
+    btn.disabled  = false;
+  }
+}
+
+/* ================================================================
+   RELATED PRODUCTS
+================================================================ */
+async function loadRelated(category) {
+  try {
+    const res  = await fetch(`${API}/products`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const all  = data.products || (Array.isArray(data) ? data : []);
+
+    const related = all
+      .filter(p => String(p._id) !== String(PID))
+      .filter(p => !category || p.category === category)
+      .slice(0, 4);
+
+    if (!related.length) return;
+
+    $("relatedSection").classList.remove("hidden");
+    $("relatedGrid").innerHTML = related.map(p => `
+      <div class="rel-card" onclick="window.location.href='product-details.html?id=${p._id}'" role="button">
+        <div class="rel-img-wrap">
+          <img
+            src="${imgUrl(p.image)}"
+            alt="${p.pname || p.name}"
+            loading="lazy"
+            onerror="onImgError(this)"
+          >
+        </div>
+        <div class="rel-body">
+          <span class="rel-cat">${p.category || "Vegetable"}</span>
+          <div class="rel-name">${p.pname || p.name}</div>
+          <span class="rel-price">${taka(p.price)} / ${unitLabel(p.unit)}</span>
+        </div>
+      </div>`).join("");
+
+  } catch (e) { /* silent — related is not critical */ }
+}
+
+/* ================================================================
+   HELPERS
+================================================================ */
+function showToast(msg, type = "success") {
+  const t = $("pdToast");
+  if (!t) return;
+  t.textContent = msg;
+  t.className   = `inline-toast toast-${type}`;
+  setTimeout(() => { t.className = "inline-toast hidden"; }, 3500);
+}
+
+function showError(msg) {
+  $("pdLoading").classList.add("hidden");
+  $("pdContent").innerHTML = "";
+  $("pdErrorMsg").textContent = msg;
+  $("pdError").classList.remove("hidden");
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(location.href)
+    .then(() => showToast("🔗 Link copied!", "success"))
+    .catch(() => showToast("Copy the URL from your browser.", "warn"));
+}
+
+/* ── Boot ── */
+init();
+</script>
+
+</body>
+</html>

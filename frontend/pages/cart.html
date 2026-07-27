@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    My Cart | AgriLink
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/cart.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+
+</head>
+
+<body class="cart-body">
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+  <h2
+    class="logo"
+    onclick="goHome()"
+  >
+    🌱 AgriLink
+  </h2>
+
+  <div class="nav-links">
+
+    <a href="../index.html">
+       Home
+    </a>
+
+    <a href="dashboard.html" class="dashboard-link">
+       Dashboard
+    </a>
+
+    <a href="profile.html">
+       Profile
+    </a>
+
+    <a
+      href="#"
+      onclick="logout()"
+    >
+       Logout
+    </a>
+
+  </div>
+
+</nav>
+
+<!-- ================= MAIN ================= -->
+
+<main class="cart-main">
+
+  <section class="cart-page">
+
+    <!-- LEFT SIDE -->
+    <div class="cart-left">
+
+      <!-- HEADER -->
+      <div class="cart-header">
+
+        <h1>
+          My Cart 🛒
+        </h1>
+
+        <p>
+          Review your selected fresh products
+        </p>
+
+      </div>
+
+      <!-- CART ITEMS -->
+      <div
+        id="cartItems"
+        class="cart-container"
+      ></div>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="cart-summary">
+
+      <div class="summary-card">
+
+        <h2>
+          Order Summary
+        </h2>
+
+        <div class="summary-row">
+
+          <span>
+            Total Products
+          </span>
+
+          <strong id="totalItems">
+            0
+          </strong>
+
+        </div>
+
+        <div class="summary-row">
+
+          <span>
+            Total Price
+          </span>
+
+          <strong id="totalPrice">
+            ৳ 0
+          </strong>
+
+        </div>
+
+        <div class="checkout-fields">
+          <label for="shipAddress">Delivery address</label>
+          <textarea id="shipAddress" rows="2" placeholder="House, road, area, city" style="width:100%;padding:10px;border-radius:8px;border:1px solid #d8ddd4;margin-bottom:10px;font-family:inherit;"></textarea>
+
+          <label for="shipPhone">Phone number</label>
+          <input type="tel" id="shipPhone" placeholder="e.g. 01XXXXXXXXX" style="width:100%;padding:10px;border-radius:8px;border:1px solid #d8ddd4;margin-bottom:6px;font-family:inherit;box-sizing:border-box;">
+        </div>
+
+        <button
+          class="checkout-btn"
+          onclick="checkout()"
+          id="checkoutBtn"
+        >
+          ✅ Checkout
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="footer">
+
+  <div class="footer-container">
+
+    <!-- BRAND -->
+    <div class="footer-box">
+
+      <h2>
+        🌱 AgriLink
+      </h2>
+
+      <p>
+        Smart Agriculture platform connecting
+        farmers and customers directly.
+      </p>
+
+    </div>
+
+    <!-- LINKS -->
+    <div class="footer-box">
+
+      <h3>
+        Quick Links
+      </h3>
+
+      <a href="../index.html">
+        Home
+      </a>
+
+      <a href="dashboard.html" class="dashboard-link">
+        Dashboard
+      </a>
+
+      <a href="profile.html">
+        Profile
+      </a>
+
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+
+    © 2026 AgriLink | Smart Agriculture 🌱
+
+  </div>
+
+</footer>
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script src="../js/config.js"></script>
+<script src="../js/app.js"></script>
+
+<script>
+
+/* =====================================================
+   CART PAGE — backend-driven (MongoDB via /api/cart)
+   NOTE: `currentUser` is already declared by app.js, which is
+   loaded before this file as a plain <script> tag (shared global
+   scope) — redeclaring it here with const/let throws a
+   SyntaxError at PARSE time and silently kills this entire
+   script block before loadCart() ever runs. Don't redeclare it.
+===================================================== */
+
+if (!currentUser) {
+  alert("Please login first!");
+  location.href = "login.html";
+} else if (currentUser.role === "farmer") {
+  alert("Farmer accounts can't purchase products. Manage your listings from the dashboard instead.");
+  location.href = "dashboard.html";
+}
+
+const API   = `${window.API_BASE || "http://localhost:5000"}/api`;
+const TOKEN = localStorage.getItem("token");
+
+function authHeaders(json = false) {
+  const h = { Authorization: `Bearer ${TOKEN}` };
+  if (json) h["Content-Type"] = "application/json";
+  return h;
+}
+
+function buildImageUrl(img) {
+  if (!img) return "../images/placeholder.jpg";
+  if (img.startsWith("http://") || img.startsWith("https://")) return img;
+  const clean = img.replace(/^\/+/, "");
+  if (clean.startsWith("uploads/")) return `${window.API_BASE || "http://localhost:5000"}/${clean}`;
+  return `${window.API_BASE || "http://localhost:5000"}/uploads/${clean}`;
+}
+
+function unitLabel(u) { return u === "piece" ? "piece" : "kg"; }
+
+let _cartItems = [];
+
+// =====================================
+// LOAD CART FROM BACKEND
+// =====================================
+
+async function loadCart() {
+
+  const cartContainer     = document.getElementById("cartItems");
+  const totalItemsElement = document.getElementById("totalItems");
+  const totalPriceElement = document.getElementById("totalPrice");
+
+  cartContainer.innerHTML = `<div class="empty-cart"><h2>Loading your cart…</h2></div>`;
+
+  try {
+    const res  = await fetch(`${API}/cart`, { headers: authHeaders() });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message || "Couldn't load cart");
+
+    _cartItems = data.items || [];
+
+    totalItemsElement.innerText = data.totalItems || 0;
+    totalPriceElement.innerText = `৳ ${Number(data.totalAmount || 0).toLocaleString("en-BD")}`;
+
+    if (!_cartItems.length) {
+      cartContainer.innerHTML = `
+        <div class="empty-cart">
+          <h2>Your cart is empty 🛒</h2>
+          <p>Add products from homepage</p>
+          <a href="../index.html" class="shop-btn">🌿 Continue Shopping</a>
+        </div>`;
+      return;
+    }
+
+    cartContainer.innerHTML = _cartItems.map(item => {
+      const p        = item.product || {};
+      const outOfStock = p.stock === 0;
+      return `
+        <div class="cart-card">
+          <div class="cart-image">
+            <img src="${buildImageUrl(p.image)}" alt="${p.pname || ''}"
+              onerror="this.src='../images/placeholder.jpg';this.onerror=null;">
+          </div>
+
+          <div class="cart-details">
+            <h3>${p.pname || "Product"}</h3>
+            <p class="cart-price">৳ ${Number(p.price || 0).toLocaleString("en-BD")} / ${unitLabel(p.unit)}</p>
+
+            <div class="qty-box">
+              <button onclick="changeQty('${item.productId}', ${item.quantity - 1})">-</button>
+              <span>${item.quantity}</span>
+              <button onclick="changeQty('${item.productId}', ${item.quantity + 1})" ${outOfStock ? "disabled" : ""}>+</button>
+            </div>
+
+            <p class="total-price">
+              Total: <strong>৳ ${Number(item.subtotal || 0).toLocaleString("en-BD")}</strong>
+            </p>
+          </div>
+
+          <div class="cart-action">
+            <button class="remove-btn" onclick="removeItem('${item.productId}')">❌ Remove</button>
+          </div>
+        </div>`;
+    }).join("");
+
+  } catch (err) {
+    console.error("Load cart error:", err);
+    cartContainer.innerHTML = `
+      <div class="empty-cart">
+        <h2>Couldn't load your cart ⚠️</h2>
+        <p>${err.message}</p>
+      </div>`;
+  }
+}
+
+// =====================================
+// CHANGE QUANTITY
+// =====================================
+
+async function changeQty(productId, newQty) {
+  if (newQty <= 0) {
+    if (!confirm("Remove this item from cart?")) return;
+  }
+
+  try {
+    const res  = await fetch(`${API}/cart/${productId}`, {
+      method:  "PUT",
+      headers: authHeaders(true),
+      body:    JSON.stringify({ quantity: newQty })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Couldn't update quantity");
+    loadCart();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// =====================================
+// REMOVE PRODUCT
+// =====================================
+
+async function removeItem(productId) {
+  if (!confirm("Remove this product?")) return;
+
+  try {
+    const res  = await fetch(`${API}/cart/${productId}`, {
+      method:  "DELETE",
+      headers: authHeaders()
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Couldn't remove item");
+    loadCart();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// =====================================
+// CHECKOUT
+// =====================================
+
+async function checkout() {
+  if (!_cartItems.length) {
+    alert("Cart is empty!");
+    return;
+  }
+
+  const shippingAddress = document.getElementById("shipAddress").value.trim();
+  const phone           = document.getElementById("shipPhone").value.trim();
+
+  if (!shippingAddress) {
+    alert("Please enter a delivery address.");
+    document.getElementById("shipAddress").focus();
+    return;
+  }
+  if (!phone) {
+    alert("Please enter a phone number.");
+    document.getElementById("shipPhone").focus();
+    return;
+  }
+
+  const btn = document.getElementById("checkoutBtn");
+  btn.disabled = true;
+  btn.textContent = "Placing order…";
+
+  try {
+    const res  = await fetch(`${API}/orders`, {
+      method:  "POST",
+      headers: authHeaders(true),
+      body:    JSON.stringify({ shippingAddress, phone })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Checkout failed");
+
+    alert("✅ Order Confirmed Successfully!");
+    window.location.href = "orders.html";
+
+  } catch (err) {
+    alert(`❌ ${err.message}`);
+    btn.disabled = false;
+    btn.textContent = "✅ Checkout";
+  }
+}
+
+// =====================================
+// INITIAL LOAD
+// =====================================
+
+document.addEventListener("DOMContentLoaded", loadCart);
+
+</script>
+
+</body>
+</html>
