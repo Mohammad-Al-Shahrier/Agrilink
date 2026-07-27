@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Register | AgriLink</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/auth.css">
+
+</head>
+
+<body class="auth-body">
+
+  <div class="auth-container">
+
+    <h2>Create Account 🌱</h2>
+
+    <form id="registerForm">
+
+      <!-- NAME -->
+      <div class="input-group">
+
+        <label>Full Name</label>
+
+        <input
+          type="text"
+          id="regName"
+          placeholder="Enter your full name"
+          required
+        >
+
+      </div>
+
+      <!-- EMAIL -->
+      <div class="input-group">
+
+        <label>Email</label>
+
+        <input
+          type="email"
+          id="regEmail"
+          placeholder="Enter your email"
+          required
+        >
+
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="input-group">
+
+        <label>Password</label>
+
+        <input
+          type="password"
+          id="regPass"
+          placeholder="Minimum 6 characters"
+          required
+        >
+
+      </div>
+
+      <!-- ROLE -->
+      <div class="input-group">
+
+        <label>Account Type</label>
+
+        <select
+          id="regRole"
+          onchange="toggleFields()"
+        >
+
+          <option value="customer">
+            Customer
+          </option>
+
+          <option value="farmer">
+            Farmer
+          </option>
+
+        </select>
+
+      </div>
+
+      <!-- FARMER -->
+      <div
+        id="farmerFields"
+        style="display:none;"
+      >
+
+        <div class="input-group">
+
+          <label>Farm Name</label>
+
+          <input
+            type="text"
+            id="farmName"
+            placeholder="Enter farm name"
+          >
+
+        </div>
+
+        <div class="input-group">
+
+          <label>Location</label>
+
+          <input
+            type="text"
+            id="location"
+            placeholder="Farm location"
+          >
+
+        </div>
+
+      </div>
+
+      <!-- CUSTOMER -->
+      <div id="customerFields">
+
+        <div class="input-group">
+
+          <label>Address</label>
+
+          <input
+            type="text"
+            id="address"
+            placeholder="Enter address"
+          >
+
+        </div>
+
+      </div>
+
+      <button
+        type="submit"
+        class="auth-btn"
+      >
+        Register
+      </button>
+
+    </form>
+
+    <p class="auth-link">
+
+      Already have an account?
+
+      <a href="login.html">
+        Login
+      </a>
+
+    </p>
+
+  </div>
+
+  <script src="../js/config.js"></script>
+<script>
+
+    const API_URL =
+      `${window.API_BASE || "http://localhost:5000"}/api/auth`;
+
+    function toggleFields() {
+
+      const role =
+        document.getElementById(
+          "regRole"
+        ).value;
+
+      const farmerFields =
+        document.getElementById(
+          "farmerFields"
+        );
+
+      const customerFields =
+        document.getElementById(
+          "customerFields"
+        );
+
+      if (role === "farmer") {
+
+        farmerFields.style.display =
+          "block";
+
+        customerFields.style.display =
+          "none";
+
+      } else {
+
+        farmerFields.style.display =
+          "none";
+
+        customerFields.style.display =
+          "block";
+      }
+    }
+
+    document
+      .getElementById("registerForm")
+      .addEventListener(
+        "submit",
+        registerUser
+      );
+
+    async function registerUser(e) {
+
+      e.preventDefault();
+
+      const role =
+        document.getElementById(
+          "regRole"
+        ).value;
+
+      const name =
+        document.getElementById(
+          "regName"
+        ).value.trim();
+
+      const email =
+        document.getElementById(
+          "regEmail"
+        ).value.trim();
+
+      const password =
+        document.getElementById(
+          "regPass"
+        ).value.trim();
+
+      const farmName =
+        document.getElementById(
+          "farmName"
+        ).value.trim();
+
+      const location =
+        document.getElementById(
+          "location"
+        ).value.trim();
+
+      const address =
+        document.getElementById(
+          "address"
+        ).value.trim();
+
+      // Frontend Validation
+
+      if (name.length < 3) {
+
+        alert(
+          "Name must be at least 3 characters."
+        );
+
+        return;
+      }
+
+      const emailRegex =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(email)) {
+
+        alert(
+          "Please enter a valid email."
+        );
+
+        return;
+      }
+
+      if (password.length < 6) {
+
+        alert(
+          "Password must be at least 6 characters."
+        );
+
+        return;
+      }
+
+      if (
+        role === "farmer" &&
+        (!farmName || !location)
+      ) {
+
+        alert(
+          "Farm Name and Location are required."
+        );
+
+        return;
+      }
+
+      if (
+        role === "customer" &&
+        !address
+      ) {
+
+        alert(
+          "Address is required."
+        );
+
+        return;
+      }
+
+      const userData = {
+
+        name,
+        email,
+        password,
+        role,
+        farmName,
+        location,
+        address
+      };
+
+      try {
+
+        const response =
+          await fetch(
+            `${API_URL}/register`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify(
+                userData
+              )
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+
+          if (
+            data.errors &&
+            Array.isArray(
+              data.errors
+            )
+          ) {
+
+            alert(
+              data.errors.join("\n")
+            );
+
+          } else {
+
+            alert(
+              data.message ||
+              "Registration failed"
+            );
+          }
+
+          return;
+        }
+
+        alert(
+          "✅ Registration Successful"
+        );
+
+        window.location.href =
+          "login.html";
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert(
+          "❌ Server Error"
+        );
+      }
+    }
+
+    toggleFields();
+
+  </script>
+
+</body>
+
+</html>
