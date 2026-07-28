@@ -448,8 +448,11 @@ function logout() {
 
 function buildImageUrl(img) {
   if (!img) return "../images/placeholder.jpg";
-  if (img.startsWith("http")) return img;
-  return `http://localhost:5000/${img.replace(/^\/+/, "")}`;
+  if (img.startsWith("http://") || img.startsWith("https://")) return img;
+  const clean = img.replace(/^\/+/, "");
+  /* MongoDB stores as "uploads/filename.jpg" — build full URL */
+  if (clean.startsWith("uploads/")) return `http://localhost:5000/${clean}`;
+  return `http://localhost:5000/uploads/${clean}`;
 }
 
 function taka(n) { return `৳${Number(n || 0).toLocaleString("en-BD")}`; }

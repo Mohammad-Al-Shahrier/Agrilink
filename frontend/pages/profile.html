@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile | AgriLink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/profile.css">
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <h2 class="logo" onclick="goHome()">🌱 AgriLink</h2>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="dashboard.html" class="dashboard-link">Dashboard</a>
+    <a href="cart.html" class="cart-link">Cart</a>
+    <a href="profile.html" class="active">Profile</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
+</nav>
+
+<main class="profile-page">
+
+  <!-- ===== LOADING STATE ===== -->
+  <div id="profileLoading" class="profile-loading">
+    <div class="spinner"></div>
+    <p>Loading your profile…</p>
+  </div>
+
+  <!-- ===== ERROR STATE ===== -->
+  <div id="profileError" class="profile-error hidden">
+    <span class="error-icon">⚠️</span>
+    <h2>Couldn't load your profile</h2>
+    <p id="profileErrorMsg">Something went wrong. Please try again.</p>
+    <button id="retryLoadBtn" class="retry-btn">↻ Retry</button>
+  </div>
+
+  <!-- ===== PROFILE CONTENT (filled by JS) ===== -->
+  <div id="profileContent" class="profile-content hidden">
+
+    <!-- ---- COVER + AVATAR ---- -->
+    <section class="profile-banner">
+      <div class="banner-bg"></div>
+
+      <div class="avatar-wrap">
+        <div class="avatar-circle" id="avatarCircle">
+          <img id="avatarImg" src="" alt="" class="hidden">
+          <span id="avatarInitials" class="avatar-initials"></span>
+        </div>
+
+        <label for="avatarInput" class="avatar-edit-btn" title="Change photo">
+          <span class="cam-icon">📷</span>
+        </label>
+        <input type="file" id="avatarInput" accept="image/*" class="hidden">
+
+        <div id="avatarSpinner" class="avatar-spinner hidden">
+          <div class="mini-spinner"></div>
+        </div>
+      </div>
+
+      <div class="banner-info">
+        <h1 id="profileName">—</h1>
+        <span id="profileRoleBadge" class="role-badge">—</span>
+      </div>
+    </section>
+
+    <!-- ---- STATS STRIP ---- -->
+    <section class="profile-stats" id="profileStats">
+      <!-- filled dynamically: orders / products / since -->
+    </section>
+
+    <!-- ---- DETAILS CARD ---- -->
+    <section class="profile-card">
+      <div class="profile-card-header">
+        <h2>Account details</h2>
+        <button id="editToggleBtn" class="edit-toggle-btn">Edit profile</button>
+      </div>
+
+      <!-- ===== VIEW MODE ===== -->
+      <div id="viewMode" class="profile-fields">
+        <div class="field-row">
+          <span class="field-label">Full name</span>
+          <span class="field-value" id="vName">—</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label">Email</span>
+          <span class="field-value" id="vEmail">—</span>
+        </div>
+        <div class="field-row">
+          <span class="field-label">Phone</span>
+          <span class="field-value" id="vPhone">—</span>
+        </div>
+
+        <!-- Farmer-only fields -->
+        <div class="field-row farmer-only hidden">
+          <span class="field-label">Farm name</span>
+          <span class="field-value" id="vFarmName">—</span>
+        </div>
+        <div class="field-row farmer-only hidden">
+          <span class="field-label">Farm location</span>
+          <span class="field-value" id="vFarmLocation">—</span>
+        </div>
+
+        <!-- Customer-only fields -->
+        <div class="field-row customer-only hidden">
+          <span class="field-label">Delivery address</span>
+          <span class="field-value" id="vAddress">—</span>
+        </div>
+      </div>
+
+      <!-- ===== EDIT MODE ===== -->
+      <form id="editForm" class="profile-fields hidden">
+        <div class="field-edit-row">
+          <label for="eName">Full name</label>
+          <input type="text" id="eName" required>
+        </div>
+
+        <div class="field-edit-row">
+          <label for="eEmail">Email</label>
+          <input type="email" id="eEmail" disabled>
+          <span class="field-hint">Email can't be changed</span>
+        </div>
+
+        <div class="field-edit-row">
+          <label for="ePhone">Phone</label>
+          <input type="text" id="ePhone" placeholder="e.g. 01XXXXXXXXX">
+        </div>
+
+        <!-- Farmer-only fields -->
+        <div class="field-edit-row farmer-only hidden">
+          <label for="eFarmName">Farm name</label>
+          <input type="text" id="eFarmName" placeholder="e.g. Green Valley Farm">
+        </div>
+        <div class="field-edit-row farmer-only hidden">
+          <label for="eFarmLocation">Farm location</label>
+          <input type="text" id="eFarmLocation" placeholder="e.g. Savar, Dhaka">
+        </div>
+
+        <!-- Customer-only fields -->
+        <div class="field-edit-row customer-only hidden">
+          <label for="eAddress">Delivery address</label>
+          <textarea id="eAddress" rows="2" placeholder="House, road, area, city"></textarea>
+        </div>
+
+        <div class="edit-actions">
+          <button type="button" id="cancelEditBtn" class="cancel-btn">Cancel</button>
+          <button type="submit" id="saveEditBtn" class="save-btn">Save changes</button>
+        </div>
+      </form>
+    </section>
+
+  </div>
+
+</main>
+
+<!-- ===== TOAST ===== -->
+<div id="toast" class="toast"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="../js/config.js"></script>
+<script src="../js/storage.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/profile.js"></script>
+
+</body>
+</html>

@@ -46,6 +46,13 @@ import {
   loginSchema
 } from "../validators/authSchema.js";
 
+import validate from "../middleware/zodValidator.js";
+
+import {
+  registerSchema,
+  loginSchema
+} from "../validators/authSchema.js";
+
 const router = express.Router();
 
 // Register Route
