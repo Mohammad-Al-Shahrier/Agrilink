@@ -44,6 +44,19 @@ function updateNavbar() {
     }
   }
 
+<<<<<<< HEAD
+  /* "Dashboard" means different things per role:
+     farmers manage their products/orders, admins approve orders
+     platform-wide, customers just want their own order history.
+     Point every .dashboard-link on the page at the right
+     destination instead of hardcoding one. */
+  if (currentUser) {
+    const inPages = window.location.pathname.includes("/pages/");
+    const page = currentUser.role === "farmer" ? "dashboard.html"
+      : currentUser.role === "admin"           ? "admin.html"
+      :                                           "orders.html";
+    const target = inPages ? page : `pages/${page}`;
+=======
   /* "Dashboard" means different things for the two roles:
      farmers manage their products/orders, customers just want
      their own order history. Point every .dashboard-link on the
@@ -53,15 +66,23 @@ function updateNavbar() {
     const target  = currentUser.role === "farmer"
       ? (inPages ? "dashboard.html" : "pages/dashboard.html")
       : (inPages ? "orders.html"    : "pages/orders.html");
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 
     document.querySelectorAll(".dashboard-link, #dashboardLink").forEach(link => {
       link.setAttribute("href", target);
     });
 
+<<<<<<< HEAD
+    /* Farmers and admins don't shop — hide the Cart link rather
+       than let it bounce them straight back out of the page. */
+    document.querySelectorAll(".cart-link").forEach(link => {
+      link.style.display = (currentUser.role === "farmer" || currentUser.role === "admin") ? "none" : "";
+=======
     /* Farmers don't shop — hide the Cart link rather than let it
        bounce them straight back out of the page they clicked from. */
     document.querySelectorAll(".cart-link").forEach(link => {
       link.style.display = currentUser.role === "farmer" ? "none" : "";
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
     });
   }
 }

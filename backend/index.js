@@ -3,6 +3,11 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+<<<<<<< HEAD
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -12,10 +17,25 @@ import productRoutes from "./routes/productRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+<<<<<<< HEAD
+import adminRoutes from "./routes/adminRoutes.js";
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 
 // Load Environment Variables
 dotenv.config({ quiet: true });
 
+<<<<<<< HEAD
+/* Fail fast instead of silently signing tokens with "undefined" —
+   a missing JWT_SECRET is a critical misconfiguration, not something
+   the server should limp along with in production. */
+if (!process.env.JWT_SECRET) {
+  console.error("❌ Missing JWT_SECRET in environment. Refusing to start.");
+  process.exit(1);
+}
+
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 /* __dirname equivalent for ES Modules — used below so the uploads
    folder resolves the same way regardless of which directory the
    process happens to be started from (important on most hosts,
@@ -63,10 +83,82 @@ app.use(
   })
 );
 
+<<<<<<< HEAD
+/* This API and the static frontend are served from different origins
+   (e.g. backend on :5000, frontend via Live Server on :5500), so the
+   default cross-origin-resource-policy would block product images
+   loaded from /uploads. CSP is also left off since this server never
+   renders HTML pages itself — only JSON + static image files. */
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: false
+  })
+);
+
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 app.use(cookieParser());
 
+<<<<<<< HEAD
+/* ---------------------------------------------------------------
+   NoSQL-injection guard
+   Strips any object key starting with "$" or containing "." from
+   req.body/req.query/req.params so a payload like
+   { "email": { "$gt": "" } } can't be used to bypass a Mongo query
+   (classic login-bypass NoSQL-injection attack).
+--------------------------------------------------------------- */
+function sanitizeValue(value) {
+  if (Array.isArray(value)) {
+    return value.map(sanitizeValue);
+  }
+  if (value && typeof value === "object") {
+    const clean = {};
+    for (const [key, val] of Object.entries(value)) {
+      if (key.startsWith("$") || key.includes(".")) continue;
+      clean[key] = sanitizeValue(val);
+    }
+    return clean;
+  }
+  return value;
+}
+
+app.use((req, res, next) => {
+  if (req.body) req.body = sanitizeValue(req.body);
+  if (req.params) req.params = sanitizeValue(req.params);
+  next();
+});
+
+/* ---------------------------------------------------------------
+   Rate limiting
+   - Auth routes get a tight limit to slow down brute-force login/
+     registration attempts.
+   - The rest of the API gets a more generous general-purpose limit
+     so normal browsing/shopping never gets throttled.
+--------------------------------------------------------------- */
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many attempts. Please try again in a few minutes." }
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many requests. Please slow down." }
+});
+
+app.use("/api/auth", authLimiter);
+app.use("/api", apiLimiter);
+
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 // Uploads Folder
 app.use(
   "/uploads",
@@ -107,6 +199,10 @@ app.use("/api/products", productRoutes);
 app.use("/api/users", profileRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+<<<<<<< HEAD
+app.use("/api/admin", adminRoutes);
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 
 // =====================================
 // 404 Route Handler

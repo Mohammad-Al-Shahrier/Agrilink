@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+backend/node_modules
+backend/.env
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/package-lock.json
+.DS_Store
+=======
 .env
 node_modules
 <<<<<<< HEAD
@@ -8,3 +16,4 @@ package-lock.json
 package-lock.json
 package.json
 >>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd

@@ -24,7 +24,12 @@ router.get("/my-products", protect, authorize("farmer"), getFarmerProducts);
 router.get("/:id", getSingleProduct);
 
 router.post("/", protect, authorize("farmer"), upload.single("image"), createProduct);
+<<<<<<< HEAD
+router.put("/:id", protect, authorize("farmer", "admin"), upload.single("image"), updateProduct);
+router.delete("/:id", protect, authorize("farmer", "admin"), deleteProduct);
+=======
 router.put("/:id", protect, authorize("farmer"), upload.single("image"), updateProduct);
 router.delete("/:id", protect, authorize("farmer"), deleteProduct);
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 
 export default router;

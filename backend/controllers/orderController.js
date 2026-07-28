@@ -121,6 +121,64 @@ export const getFarmerOrders = async (req, res) => {
 };
 
 /* ================================================================
+<<<<<<< HEAD
+   GET /api/orders/admin/all   — admin: every order in the system
+   Supports optional ?status= filter for the admin dashboard tabs.
+================================================================ */
+export const getAllOrders = async (req, res) => {
+  try {
+    const filter = {};
+    const { status } = req.query;
+    const allowed = ["pending", "confirmed", "delivered", "cancelled"];
+
+    if (status && status !== "all") {
+      if (!allowed.includes(status)) {
+        return res.status(400).json({ success: false, message: "Invalid status filter" });
+      }
+      filter.status = status;
+    }
+
+    const orders = await Order.find(filter)
+      .populate("items.productId", "pname image unit price")
+      .populate("items.farmer", "name farmName")
+      .populate("userId", "name email phone")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ success: true, count: orders.length, orders });
+  } catch (error) {
+    console.error("getAllOrders error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+/* ================================================================
+   PUT /api/orders/:id/status   { status }
+   - A farmer may update the status of an order that contains at
+     least one of their products (e.g. mark it "confirmed" or
+     "delivered").
+   - An admin may approve/update the status of ANY order — this
+     backs the "approve order" admin dashboard.
+   Status transitions are restricted so an order can't jump
+   backwards or be edited once it's in a final state.
+================================================================ */
+const ALLOWED_STATUSES = ["pending", "confirmed", "delivered", "cancelled"];
+
+/* Which statuses a given current status is allowed to move to.
+   Keeps the workflow linear/sane and stops accidental "un-delivering"
+   or "un-cancelling" an order from either dashboard. */
+const STATUS_TRANSITIONS = {
+  pending:   ["confirmed", "cancelled"],
+  confirmed: ["delivered", "cancelled"],
+  delivered: [],   // final state
+  cancelled: []    // final state
+};
+
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    if (!ALLOWED_STATUSES.includes(status)) {
+=======
    PUT /api/orders/:id/status   { status }
    A farmer may update the status of an order that contains at
    least one of their products (e.g. mark it "confirmed" or
@@ -132,6 +190,7 @@ export const updateOrderStatus = async (req, res) => {
     const allowed = ["pending", "confirmed", "delivered", "cancelled"];
 
     if (!allowed.includes(status)) {
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
       return res.status(400).json({ success: false, message: "Invalid status value" });
     }
 
@@ -140,11 +199,35 @@ export const updateOrderStatus = async (req, res) => {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
 
+<<<<<<< HEAD
+    const isAdmin = req.user.role === "admin";
+
+    if (!isAdmin) {
+      const ownsAnItem = order.items.some(
+        i => i.farmer.toString() === req.user._id.toString()
+      );
+      if (!ownsAnItem) {
+        return res.status(403).json({ success: false, message: "Not authorized" });
+      }
+    }
+
+    if (order.status === status) {
+      return res.status(200).json({ success: true, message: "Order status unchanged", order });
+    }
+
+    const nextAllowed = STATUS_TRANSITIONS[order.status] || [];
+    if (!nextAllowed.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot move an order from "${order.status}" to "${status}"`
+      });
+=======
     const ownsAnItem = order.items.some(
       i => i.farmer.toString() === req.user._id.toString()
     );
     if (!ownsAnItem) {
       return res.status(403).json({ success: false, message: "Not authorized" });
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
     }
 
     order.status = status;

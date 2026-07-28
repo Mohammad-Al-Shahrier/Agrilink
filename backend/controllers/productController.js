@@ -184,8 +184,14 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
+<<<<<<< HEAD
+    /* Only the farmer who created it — or an admin — can update it */
+    const isOwner = product.farmer.toString() === req.user._id.toString();
+    if (!isOwner && req.user.role !== "admin") {
+=======
     /* Only the farmer who created it can update */
     if (product.farmer.toString() !== req.user._id.toString()) {
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
       return res.status(403).json({ success: false, message: "Not authorized" });
     }
 
@@ -231,8 +237,14 @@ export const deleteProduct = async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
+<<<<<<< HEAD
+    /* Only the farmer who created it — or an admin — can delete it */
+    const isOwner = product.farmer.toString() === req.user._id.toString();
+    if (!isOwner && req.user.role !== "admin") {
+=======
     /* Only the farmer who created it can delete */
     if (product.farmer.toString() !== req.user._id.toString()) {
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
       return res.status(403).json({ success: false, message: "Not authorized" });
     }
 

@@ -49,6 +49,18 @@ const protect = async (
       });
     }
 
+<<<<<<< HEAD
+    if (user.isActive === false) {
+
+      return res.status(403).json({
+        success: false,
+        message:
+          "Your account has been suspended. Please contact support."
+      });
+    }
+
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
     req.user = user;
 
     next();
