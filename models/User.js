@@ -22,11 +22,19 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
     },
 
+<<<<<<< HEAD
     role: {
       type: String,
       enum: ["farmer", "customer", "admin"],
       default: "customer",
     },
+=======
+  password:{
+    type:String,
+    required:true,
+    minlength:6
+  },
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 
     phone: {
       type: String,
@@ -54,6 +62,7 @@ const userSchema = new mongoose.Schema(
       default: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
     },
 
+<<<<<<< HEAD
     isVerified: {
       type: Boolean,
       default: false,
@@ -62,6 +71,21 @@ const userSchema = new mongoose.Schema(
   {
     timestamps: true,
   }
+=======
+  profileImage:{
+    type:String,
+    default:"https://cdn-icons-png.flaticon.com/512/149/149071.png"
+  },
+
+  isVerified:{
+    type:Boolean,
+    default:false
+  }
+},
+{
+  timestamps:true
+}
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 );
 
 export default mongoose.model("User", userSchema);

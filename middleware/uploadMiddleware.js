@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* ================================================================
    middleware/uploadMiddleware.js  —  AgriLink
    
@@ -56,6 +57,50 @@ const upload = multer({
   storage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }  /* 5 MB */
+=======
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+const uploadPath = "uploads/products";
+
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, {
+    recursive: true
+  });
+}
+
+const storage = multer.diskStorage({
+
+  destination: (
+    req,
+    file,
+    cb
+  ) => {
+
+    cb(null, uploadPath);
+
+  },
+
+  filename: (
+    req,
+    file,
+    cb
+  ) => {
+
+    cb(
+      null,
+      Date.now() +
+      path.extname(
+        file.originalname
+      )
+    );
+  }
+});
+
+const upload = multer({
+  storage
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 });
 
 export default upload;

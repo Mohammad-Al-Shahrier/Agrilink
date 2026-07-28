@@ -3,14 +3,19 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+<<<<<<< HEAD
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import path from "path";
 import { fileURLToPath } from "url";
+=======
+import path from "path";
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 
 // Routes
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+<<<<<<< HEAD
 import profileRoutes from "./routes/profileRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
@@ -32,6 +37,14 @@ if (!process.env.JWT_SECRET) {
    which don't always `cd` into the project root first). */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
+=======
+import userRoutes from "./routes/profileRoutes.js";
+// import cartRoutes from "./routes/cartRoutes.js";
+// import orderRoutes from "./routes/orderRoutes.js";
+
+// Load Environment Variables
+dotenv.config();
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 
 // Initialize App
 const app = express();
@@ -40,6 +53,7 @@ const app = express();
 // Middleware
 // =====================================
 
+<<<<<<< HEAD
 /* Allow the configured CLIENT_URL plus a couple of common local dev
    origins (VS Code Live Server, plain `http-server`, etc.) so the
    frontend works out of the box regardless of how it's served. */
@@ -69,10 +83,18 @@ app.use(
       if (!isProd) return callback(null, true);
       return callback(new Error("Not allowed by CORS"));
     },
+=======
+app.use(
+  cors({
+    origin:
+      process.env.CLIENT_URL ||
+      "http://127.0.0.1:5500",
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
     credentials: true
   })
 );
 
+<<<<<<< HEAD
 /* This API and the static frontend are served from different origins
    (e.g. backend on :5000, frontend via Live Server on :5500), so the
    default cross-origin-resource-policy would block product images
@@ -85,10 +107,13 @@ app.use(
   })
 );
 
+=======
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 app.use(cookieParser());
 
+<<<<<<< HEAD
 /* ---------------------------------------------------------------
    NoSQL-injection guard
    Strips any object key starting with "$" or containing "." from
@@ -143,11 +168,17 @@ const apiLimiter = rateLimit({
 app.use("/api/auth", authLimiter);
 app.use("/api", apiLimiter);
 
+=======
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 // Uploads Folder
 app.use(
   "/uploads",
   express.static(
+<<<<<<< HEAD
     path.join(__dirname, "uploads")
+=======
+    path.join(process.cwd(), "uploads")
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
   )
 );
 
@@ -169,8 +200,12 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
     server: "running",
+<<<<<<< HEAD
     database:
       mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+=======
+    database: "connected"
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
   });
 });
 
@@ -179,10 +214,21 @@ app.get("/api/health", (req, res) => {
 // =====================================
 
 app.use("/api/auth", authRoutes);
+<<<<<<< HEAD
 app.use("/api/products", productRoutes);
 app.use("/api/users", profileRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+=======
+
+app.use("/api/products", productRoutes);
+
+app.use("/api/users", userRoutes);
+
+// app.use("/api/cart", cartRoutes);
+
+// app.use("/api/orders", orderRoutes);
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 
 // =====================================
 // 404 Route Handler
@@ -249,4 +295,8 @@ const startServer = async () => {
   }
 };
 
+<<<<<<< HEAD
 startServer();
+=======
+startServer();
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
