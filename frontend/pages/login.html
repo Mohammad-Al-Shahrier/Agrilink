@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Login | AgriLink</title>
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/auth.css">
+
+</head>
+
+<body class="auth-body">
+
+  <div class="auth-container">
+
+    <div class="auth-header">
+
+      <h1>🌱 AgriLink</h1>
+
+      <p>Welcome Back</p>
+
+    </div>
+
+    <form id="loginForm">
+
+      <div class="input-group">
+
+        <label>Email</label>
+
+        <input
+          type="email"
+          id="loginEmail"
+          placeholder="Enter your email"
+          required
+        >
+
+      </div>
+
+      <div class="input-group">
+
+        <label>Password</label>
+
+        <input
+          type="password"
+          id="loginPass"
+          placeholder="Enter your password"
+          required
+        >
+
+      </div>
+
+      <button
+        type="submit"
+        class="auth-btn"
+      >
+        Login
+      </button>
+
+    </form>
+
+    <p class="auth-link">
+
+      Don't have an account?
+
+      <a href="register.html">
+        Register
+      </a>
+
+    </p>
+
+  </div>
+
+  <script src="../js/config.js"></script>
+<script>
+
+    const API_URL =
+      `${window.API_BASE || "http://localhost:5000"}/api/auth`;
+
+    document
+      .getElementById("loginForm")
+      .addEventListener(
+        "submit",
+        loginUser
+      );
+
+    async function loginUser(e) {
+
+      e.preventDefault();
+
+      const email =
+        document
+          .getElementById("loginEmail")
+          .value
+          .trim();
+
+      const password =
+        document
+          .getElementById("loginPass")
+          .value
+          .trim();
+
+      // ======================
+      // Frontend Validation
+      // ======================
+
+      if (!email) {
+
+        alert("Email is required");
+
+        return;
+      }
+
+      const emailRegex =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(email)) {
+
+        alert("Please enter a valid email");
+
+        return;
+      }
+
+      if (!password) {
+
+        alert("Password is required");
+
+        return;
+      }
+
+      try {
+
+        const response =
+          await fetch(
+            `${API_URL}/login`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+                email,
+                password
+              })
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+
+          // Zod Validation Errors
+          if (data.errors) {
+
+            const messages =
+              data.errors
+                .map(error =>
+                  error.message
+                )
+                .join("\n");
+
+            alert(messages);
+
+          } else {
+
+            alert(
+              data.message ||
+              "Login failed"
+            );
+
+          }
+
+          return;
+        }
+
+        // Save JWT Token
+
+        localStorage.setItem(
+          "token",
+          data.token
+        );
+
+        // Save User Info
+
+        localStorage.setItem(
+          "currentUser",
+          JSON.stringify(data.user)
+        );
+
+        alert(
+          "✅ Login Successful"
+        );
+
+        window.location.href =
+          data.user.role === "admin"
+            ? "admin.html"
+            : "../index.html";
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+        alert(
+          "❌ Server Error"
+        );
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>
