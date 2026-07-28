@@ -58,6 +58,7 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+<<<<<<< HEAD
 
     /* Admin can suspend an account (farmer or customer) without
        deleting it — a blocked user is refused at auth-middleware
@@ -66,6 +67,8 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
   },
   {
     timestamps: true,

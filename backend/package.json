@@ -6,8 +6,12 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+<<<<<<< HEAD
     "dev": "nodemon index.js",
     "create-admin": "node scripts/createAdmin.js"
+=======
+    "dev": "nodemon index.js"
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
   },
   "engines": {
     "node": ">=18.0.0"
@@ -29,8 +33,11 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+<<<<<<< HEAD
     "express-rate-limit": "^7.4.1",
     "helmet": "^8.0.0",
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.8.0",
     "multer": "^2.2.0",

@@ -1,0 +1,91 @@
+import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+    },
+
+<<<<<<< HEAD
+    role: {
+      type: String,
+      enum: ["farmer", "customer", "admin"],
+      default: "customer",
+    },
+=======
+  password:{
+    type:String,
+    required:true,
+    minlength:6
+  },
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
+
+    phone: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    farmName: {
+      type: String,
+      default: "",
+    },
+
+    location: {
+      type: String,
+      default: "",
+    },
+
+    address: {
+      type: String,
+      default: "",
+    },
+
+    profileImage: {
+      type: String,
+      default: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+    },
+
+<<<<<<< HEAD
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+=======
+  profileImage:{
+    type:String,
+    default:"https://cdn-icons-png.flaticon.com/512/149/149071.png"
+  },
+
+  isVerified:{
+    type:Boolean,
+    default:false
+  }
+},
+{
+  timestamps:true
+}
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
+);
+
+export default mongoose.model("User", userSchema);

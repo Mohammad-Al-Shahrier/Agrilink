@@ -37,6 +37,7 @@
       text-decoration: none;
       border-radius: 10px;
     }
+<<<<<<< HEAD
     #statusToast {
       position: fixed;
       bottom: 24px;
@@ -56,6 +57,8 @@
       transition: all .25s ease;
     }
     #statusToast.show { transform: translateY(0); opacity: 1; }
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
   </style>
 </head>
 <body>
@@ -111,8 +114,11 @@
 
 </main>
 
+<<<<<<< HEAD
 <div id="statusToast"></div>
 
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 <script src="../js/config.js"></script>
 <script src="../js/storage.js"></script>
 <script src="../js/app.js"></script>
@@ -132,9 +138,12 @@ if (!currentUser) {
 } else if (currentUser.role === "farmer") {
   // Farmers manage orders from the full dashboard instead
   window.location.href = "dashboard.html";
+<<<<<<< HEAD
 } else if (currentUser.role === "admin") {
   // Admins approve/manage every order from the admin dashboard
   window.location.href = "admin.html";
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 }
 
 function taka(n) { return `৳${Number(n || 0).toLocaleString("en-BD")}`; }
@@ -148,6 +157,7 @@ function buildImageUrl(img) {
   return `${window.API_BASE || "http://localhost:5000"}/uploads/${clean}`;
 }
 
+<<<<<<< HEAD
 /* Remembers each order's last-seen status so a poll can detect
    changes (e.g. farmer/admin marking an order "delivered") and
    surface them to the customer without a manual refresh. */
@@ -169,6 +179,9 @@ const STATUS_LABEL = {
 };
 
 async function loadMyOrders(isPoll = false) {
+=======
+async function loadMyOrders() {
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
   const wrap = document.getElementById("ordersWrap");
 
   try {
@@ -178,6 +191,7 @@ async function loadMyOrders(isPoll = false) {
     const data   = await res.json();
     const orders = data.orders || [];
 
+<<<<<<< HEAD
     /* Diff against last-seen statuses to auto-notify on change —
        this is what makes "order status auto-updates" visible to the
        customer instead of them having to refresh the page. */
@@ -191,6 +205,8 @@ async function loadMyOrders(isPoll = false) {
       _lastKnownStatus[order._id] = curr;
     });
 
+=======
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
     const pending = orders.filter(o => ["pending", "confirmed"].includes((o.status || "").toLowerCase())).length;
     const spent   = orders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
 
@@ -251,11 +267,15 @@ async function loadMyOrders(isPoll = false) {
   }
 }
 
+<<<<<<< HEAD
 document.addEventListener("DOMContentLoaded", () => {
   loadMyOrders(false);
   // Poll for status changes (e.g. "delivered") every 15s.
   setInterval(() => loadMyOrders(true), 15000);
 });
+=======
+document.addEventListener("DOMContentLoaded", loadMyOrders);
+>>>>>>> 6153e036b889b1351e7d1ee07225cee9016c15fd
 </script>
 
 </body>
