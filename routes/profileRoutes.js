@@ -1,4 +1,15 @@
 import express from "express";
+<<<<<<< HEAD
+import { getMe, updateMe } from "../controllers/userController.js";
+import protect from "../middleware/authMiddleware.js";
+
+const router = express.Router();
+
+router.get("/me", protect, getMe);
+router.put("/me", protect, updateMe);
+
+export default router;
+=======
 import User from "../models/User.js";
 import protect from "../middleware/authMiddleware.js";
 
@@ -102,3 +113,4 @@ router.put("/me", protect, async (req, res) => {
 });
 
 export default router;
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21

@@ -37,6 +37,16 @@ if(existingUser){
   });
 }
 
+<<<<<<< HEAD
+/* SECURITY: never trust a client-supplied "admin" role at signup —
+   only "farmer" is allowed to be chosen explicitly, everything else
+   (including no role, or someone POSTing role:"admin") falls back
+   to "customer". Admin accounts must be created directly in the
+   database/by another admin, never through public registration. */
+const safeRole = role === "farmer" ? "farmer" : "customer";
+
+=======
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 const hashedPassword =
 await bcrypt.hash(password,10);
 
@@ -46,6 +56,18 @@ await User.create({
   name,
   email,
   password:hashedPassword,
+<<<<<<< HEAD
+  role:safeRole,
+
+  farmName:
+  safeRole==="farmer" ? farmName : "",
+
+  location:
+  safeRole==="farmer" ? location : "",
+
+  address:
+  safeRole==="customer" ? address : ""
+=======
   role,
 
   farmName:
@@ -56,6 +78,7 @@ await User.create({
 
   address:
   role==="customer" ? address : ""
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 
 });
 
@@ -72,6 +95,11 @@ process.env.JWT_SECRET,
 
 res.cookie("token",token,{
   httpOnly:true,
+<<<<<<< HEAD
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+=======
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
   maxAge:7*24*60*60*1000
 });
 
@@ -148,6 +176,11 @@ process.env.JWT_SECRET,
 
 res.cookie("token",token,{
   httpOnly:true,
+<<<<<<< HEAD
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+=======
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
   maxAge:7*24*60*60*1000
 });
 
@@ -168,9 +201,17 @@ res.status(200).json({
 
 }catch(error){
 
+<<<<<<< HEAD
+console.error("Login error:", error.message);
+
+res.status(500).json({
+  success:false,
+  message:"Server error. Please try again."
+=======
 res.status(500).json({
   success:false,
   message:error.message
+>>>>>>> 996f52fab8cbb13c1c980eb0f3f6865a3c35da21
 });
 
 }
